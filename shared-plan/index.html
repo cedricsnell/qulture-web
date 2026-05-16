@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-itunes-app" content="app-id=6759091761" />
+  <title>Qulture — Shared Plan</title>
+  <meta name="description" content="A plan shared with you on Qulture." />
+
+  <meta property="og:title" content="Shared plan on Qulture" />
+  <meta property="og:description" content="Someone shared a plan with you." />
+  <meta property="og:site_name" content="Qulture" />
+  <meta property="og:type" content="website" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --bg-card: #13131a;
+      --bg-item: #18181f;
+      --primary: #7c3aed;
+      --primary-light: #a78bfa;
+      --pink: #ec4899;
+      --green: #10b981;
+      --gold: #f59e0b;
+      --text: #f8f8ff;
+      --text-secondary: #a0a0b8;
+      --text-tertiary: #606070;
+      --border: rgba(255,255,255,0.07);
+      --border-hover: rgba(167,139,250,0.3);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary-light), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--pink));
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      transition: opacity 0.2s, transform 0.15s;
+      white-space: nowrap;
+    }
+    .nav-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ── Page wrapper ── */
+    .page {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 16px 80px;
+    }
+
+    /* ── States ── */
+    .state-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      text-align: center;
+      gap: 12px;
+      padding: 40px 24px;
+    }
+
+    .state-icon { font-size: 52px; margin-bottom: 8px; }
+
+    .state-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .state-subtitle {
+      font-size: 15px;
+      color: var(--text-secondary);
+      max-width: 320px;
+      line-height: 1.6;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary-light);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Plan header ── */
+    .plan-header {
+      text-align: center;
+      padding: 40px 0 28px;
+    }
+
+    .plan-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(236,72,153,0.15));
+      border: 1px solid rgba(124,58,237,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 20px;
+    }
+
+    .plan-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .plan-meta {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+    }
+
+    /* ── CTA buttons ── */
+    .btn-row {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .btn-primary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--pink));
+      color: #fff;
+      text-decoration: none;
+      padding: 16px 24px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 8px 24px rgba(124,58,237,0.3);
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+
+    .btn-secondary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      text-decoration: none;
+      padding: 14px 24px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-secondary:hover {
+      border-color: var(--border-hover);
+      background: rgba(124,58,237,0.08);
+    }
+
+    /* ── Section / day label ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin: 28px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Option cards ── */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .option-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .option-card:last-child { border-bottom: none; }
+
+    .option-thumb {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg-card);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+    }
+    .option-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .option-content { flex: 1; min-width: 0; }
+
+    .option-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .option-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .option-price {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .decided-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green);
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 6px;
+      padding: 2px 8px;
+      margin-bottom: 6px;
+    }
+
+    .option-location {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      text-decoration: none;
+      margin-bottom: 4px;
+      transition: color 0.2s;
+    }
+    .option-location:hover { color: var(--primary-light); }
+
+    .option-location-text {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .option-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--primary-light);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .option-link:hover { opacity: 0.8; }
+
+    /* ── Acquisition footer ── */
+    .acq-card {
+      margin-top: 48px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .acq-logo {
+      font-size: 18px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary-light), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .acq-tagline {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .acq-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--pink));
+      color: #fff;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 6px 20px rgba(124,58,237,0.3);
+    }
+    .acq-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    .acq-sub {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 400px) {
+      .btn-primary, .btn-secondary { font-size: 14px; padding: 14px 16px; }
+      .plan-title { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a class="nav-logo" href="https://qulture.app">Qulture</a>
+    <a class="nav-btn" href="https://apps.apple.com/app/id6759091761">
+      ↓ Get the App
+    </a>
+  </nav>
+
+  <!-- Loading -->
+  <div class="page" id="state-loading">
+    <div class="state-center">
+      <div class="spinner"></div>
+      <p class="state-subtitle">Loading plan…</p>
+    </div>
+  </div>
+
+  <!-- Not found -->
+  <div class="page hidden" id="state-not-found">
+    <div class="state-center">
+      <div class="state-icon">🔗</div>
+      <p class="state-title">Plan not found</p>
+      <p class="state-subtitle">This share link is invalid or has been removed.</p>
+    </div>
+  </div>
+
+  <!-- Loaded plan -->
+  <div class="page hidden" id="state-plan">
+    <div class="plan-header">
+      <div class="plan-icon" id="plan-icon">✨</div>
+      <h1 class="plan-title" id="plan-title">—</h1>
+      <p class="plan-meta" id="plan-meta">—</p>
+
+      <div class="btn-row">
+        <a class="btn-primary" id="open-in-app" href="#">
+          📱 Open in Qulture
+        </a>
+        <a class="btn-secondary" href="https://apps.apple.com/app/id6759091761">
+          ↓ Download Qulture — Free on the App Store
+        </a>
+      </div>
+    </div>
+
+    <div id="options-container"></div>
+
+    <div class="acq-card">
+      <div class="acq-logo">Qulture</div>
+      <p class="acq-tagline">
+        Plan trips, dinners, and nights out with AI — together.
+      </p>
+      <a class="acq-btn" href="https://apps.apple.com/app/id6759091761">
+        Get Qulture — Free on iOS
+      </a>
+      <p class="acq-sub">Made with ♥ by Proprius Labs</p>
+    </div>
+  </div>
+
+  <script>
+    const APP_STORE = 'https://apps.apple.com/app/id6759091761';
+
+    const CATEGORY_ICONS = {
+      hotel: '🏨', restaurant: '🍽', activity: '🎯',
+      transport: '🚗', item: '🛍', general: '✨',
+    };
+
+    const SESSION_TYPE_ICONS = {
+      trip: '✈️', dinner: '🍽', night_out: '🌃',
+      date: '💫', event: '🎉', general: '✨',
+    };
+
+    function showState(id) {
+      ['state-loading', 'state-not-found', 'state-plan'].forEach((s) => {
+        document.getElementById(s).classList.toggle('hidden', s !== id);
+      });
+    }
+
+    function getToken() {
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      return parts[parts.length - 1] || null;
+    }
+
+    function buildOptionCard(opt) {
+      const emoji = CATEGORY_ICONS[opt.category] || '✨';
+      const card = document.createElement('div');
+      card.className = 'option-card';
+
+      // Thumbnail
+      const thumb = document.createElement('div');
+      thumb.className = 'option-thumb';
+      if (opt.imageUrl) {
+        const img = document.createElement('img');
+        img.src = opt.imageUrl;
+        img.alt = opt.title;
+        img.onerror = () => { thumb.textContent = emoji; };
+        thumb.appendChild(img);
+      } else {
+        thumb.textContent = emoji;
+      }
+      card.appendChild(thumb);
+
+      // Content
+      const content = document.createElement('div');
+      content.className = 'option-content';
+
+      // Title + price
+      const titleRow = document.createElement('div');
+      titleRow.className = 'option-title-row';
+      const title = document.createElement('span');
+      title.className = 'option-title';
+      title.textContent = opt.title;
+      titleRow.appendChild(title);
+      if (opt.priceRange) {
+        const price = document.createElement('span');
+        price.className = 'option-price';
+        price.textContent = opt.priceRange;
+        titleRow.appendChild(price);
+      }
+      content.appendChild(titleRow);
+
+      // Decided badge
+      if (opt.status === 'decided') {
+        const badge = document.createElement('div');
+        badge.className = 'decided-badge';
+        badge.textContent = '✓ Chosen';
+        content.appendChild(badge);
+      }
+
+      // Location
+      if (opt.location) {
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(opt.location)}`;
+        const loc = document.createElement('a');
+        loc.className = 'option-location';
+        loc.href = mapsUrl;
+        loc.target = '_blank';
+        loc.rel = 'noopener noreferrer';
+        loc.innerHTML = `<span>📍</span><span class="option-location-text">${opt.location}</span>`;
+        content.appendChild(loc);
+      }
+
+      // External link
+      if (opt.url) {
+        const link = document.createElement('a');
+        link.className = 'option-link';
+        link.href = opt.url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.innerHTML = '<span>🔗</span><span>View details</span>';
+        content.appendChild(link);
+      }
+
+      card.appendChild(content);
+      return card;
+    }
+
+    async function load() {
+      const token = getToken();
+      if (!token || token === 'index.html') {
+        showState('state-not-found');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/.netlify/functions/get-shared-plan?token=${encodeURIComponent(token)}`);
+
+        if (res.status === 404) { showState('state-not-found'); return; }
+        if (!res.ok) { showState('state-not-found'); return; }
+
+        const data = await res.json();
+        if (data.error) { showState('state-not-found'); return; }
+
+        // Populate header
+        const typeIcon = SESSION_TYPE_ICONS[data.sessionType] || '✨';
+        document.getElementById('plan-icon').textContent = typeIcon;
+        document.getElementById('plan-title').textContent = data.title;
+        document.getElementById('plan-meta').textContent =
+          `Planned by ${data.ownerName} · ${data.options.length} ${data.options.length === 1 ? 'item' : 'items'}`;
+
+        document.title = `${data.title} — Qulture`;
+
+        // Deep link
+        const deepLink = `qulture://shared-plan/${token}`;
+        document.getElementById('open-in-app').href = deepLink;
+
+        // Render options — group by dayLabel if present
+        const container = document.getElementById('options-container');
+        const hasDays = data.options.some((o) => o.dayLabel);
+
+        if (hasDays) {
+          const groups = {};
+          const order = [];
+          for (const o of data.options) {
+            const key = o.dayLabel || 'Other';
+            if (!groups[key]) { groups[key] = []; order.push(key); }
+            groups[key].push(o);
+          }
+          for (const day of order) {
+            const label = document.createElement('p');
+            label.className = 'section-label';
+            label.textContent = day;
+            container.appendChild(label);
+            const list = document.createElement('div');
+            list.className = 'options-list';
+            groups[day].forEach((o) => list.appendChild(buildOptionCard(o)));
+            container.appendChild(list);
+          }
+        } else {
+          const label = document.createElement('p');
+          label.className = 'section-label';
+          label.textContent = `${data.options.length} ${data.options.length === 1 ? 'Place' : 'Places'}`;
+          container.appendChild(label);
+          const list = document.createElement('div');
+          list.className = 'options-list';
+          data.options.forEach((o) => list.appendChild(buildOptionCard(o)));
+          container.appendChild(list);
+        }
+
+        showState('state-plan');
+
+        // Auto deep-link on mobile
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          setTimeout(() => { window.location.href = deepLink; }, 1200);
+        }
+
+      } catch {
+        showState('state-not-found');
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>
