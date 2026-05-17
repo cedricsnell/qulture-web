@@ -32,16 +32,20 @@ async function fetchPlacePhoto(name, location, googleKey) {
     if (!res.ok) return null;
     const data = await res.json();
 
+    if (data.status !== 'OK') return null;
     const candidate = data.candidates && data.candidates[0];
     const photo = candidate && candidate.photos && candidate.photos[0];
     if (!photo || !photo.photo_reference) return null;
 
-    // Return a Places Photo URL — the Netlify function key never leaves the server;
-    // the browser fetches this URL which redirects to the CDN image.
-    return (
+    // Follow the redirect server-side so the returned URL is a key-free CDN URL
+    // (lh3.googleusercontent.com) that the browser can load without CORS issues.
+    const photoApiUrl = (
       'https://maps.googleapis.com/maps/api/place/photo'
       + `?maxwidth=800&photo_reference=${photo.photo_reference}&key=${googleKey}`
     );
+    const photoRes = await fetch(photoApiUrl, { redirect: 'follow' });
+    if (!photoRes.ok) return null;
+    return photoRes.url;
   } catch (_) {
     return null;
   }
