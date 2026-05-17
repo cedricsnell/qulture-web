@@ -853,8 +853,10 @@
           return fetchWikiPhoto(o.title, o.location);
         });
 
-        // City hero photo via Wikipedia (function doesn't handle this)
-        var cityFetch = fetchWikiPhoto(ctx.destination, null);
+        // Hero photo: use server-provided value, fall back to Wikipedia
+        var cityFetch = data.heroImageUrl
+          ? Promise.resolve(data.heroImageUrl)
+          : fetchWikiPhoto(ctx.destination, null);
 
         return Promise.all([Promise.all(poiFetches), cityFetch]).then(function(results){
           var photos    = results[0];
