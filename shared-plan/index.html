@@ -423,7 +423,7 @@
 <nav class="nav">
   <div class="nav-inner">
     <a href="https://qulture.app" class="nav-logo">
-      <img src="/qulture-logo.svg" alt="Qulture" class="nav-logo-img" />
+      <img src="/qulture-logo.png" alt="Qulture" class="nav-logo-img" />
       Qulture
     </a>
     <a href="https://apps.apple.com/app/id6759091761" class="nav-cta" target="_blank" rel="noopener">
@@ -556,15 +556,37 @@
     }).then(function(r){ return r.json(); });
   }
 
-  function fetchWikiPhoto(query) {
+  function fetchWikiPhoto(query, location) {
     if (!query) return Promise.resolve(null);
-    var term = query.split(',')[0].trim();
-    return fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(term))
+    // Build search term: "Title, Location" gives better geo-specific results
+    var term = location
+      ? query.split(',')[0].trim() + ' ' + location.split(',')[0].trim()
+      : query.split(',')[0].trim();
+    // Use the Wikipedia search API (fuzzy) rather than exact-title summary
+    var url = 'https://en.wikipedia.org/w/api.php'
+      + '?action=query&list=search&srsearch=' + encodeURIComponent(term)
+      + '&srlimit=1&srprop=&format=json&origin=*';
+    return fetch(url)
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data){
-        if (!data || data.type === 'disambiguation') return null;
-        return (data.originalimage && data.originalimage.source) ||
-               (data.thumbnail    && data.thumbnail.source)    || null;
+        if (!data) return null;
+        var hits = data.query && data.query.search;
+        if (!hits || hits.length === 0) return null;
+        var pageId = hits[0].pageid;
+        // Fetch the thumbnail for the matched page
+        return fetch(
+          'https://en.wikipedia.org/w/api.php'
+          + '?action=query&pageids=' + pageId
+          + '&prop=pageimages&pithumbsize=800&format=json&origin=*'
+        );
+      })
+      .then(function(r){ return r && r.ok ? r.json() : null; })
+      .then(function(data){
+        if (!data) return null;
+        var pages = data.query && data.query.pages;
+        if (!pages) return null;
+        var page = Object.values(pages)[0];
+        return (page && page.thumbnail && page.thumbnail.source) || null;
       })
       .catch(function(){ return null; });
   }
@@ -771,7 +793,7 @@
           '?id=eq.' + encodeURIComponent(s.created_by) +
           '&select=display_name,username'
         ),
-        fetchWikiPhoto(ctx.destination),
+        fetchWikiPhoto(ctx.destination, null),
       ]).then(function(results){
         var opts      = results[0] || [];
         var profiles  = results[1] || [];
@@ -780,7 +802,7 @@
         // Batch-fetch Wikipedia images for any option missing an image_url
         var poiFetches = opts.map(function(o){
           if (o.image_url) return Promise.resolve(o.image_url);
-          return fetchWikiPhoto(o.title);
+          return fetchWikiPhoto(o.title, o.location);
         });
 
         return Promise.all(poiFetches).then(function(photos){
