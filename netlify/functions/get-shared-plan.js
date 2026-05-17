@@ -16,32 +16,38 @@ const CORS = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-// Call Google Places "Find Place from Text" and return a photo URL, or null.
+// Call Google Places API (New) and return a photo CDN URL, or null.
 async function fetchPlacePhoto(name, location, googleKey) {
   if (!googleKey || !name) return null;
   try {
     const query = location ? `${name} ${location.split(',')[0]}` : name;
-    const findUrl =
-      'https://maps.googleapis.com/maps/api/place/findplacefromtext/json'
-      + `?input=${encodeURIComponent(query)}`
-      + '&inputtype=textquery'
-      + '&fields=photos'
-      + `&key=${googleKey}`;
 
-    const res = await fetch(findUrl);
-    if (!res.ok) return null;
-    const data = await res.json();
-
-    const candidate = data.candidates && data.candidates[0];
-    const photo = candidate && candidate.photos && candidate.photos[0];
-    if (!photo || !photo.photo_reference) return null;
-
-    // Return a Places Photo URL — the Netlify function key never leaves the server;
-    // the browser fetches this URL which redirects to the CDN image.
-    return (
-      'https://maps.googleapis.com/maps/api/place/photo'
-      + `?maxwidth=800&photo_reference=${photo.photo_reference}&key=${googleKey}`
+    // 1. Text Search (New) — find the place and get a photo name
+    const searchRes = await fetch(
+      'https://places.googleapis.com/v1/places:searchText',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': googleKey,
+          'X-Goog-FieldMask': 'places.photos',
+        },
+        body: JSON.stringify({ textQuery: query }),
+      }
     );
+    if (!searchRes.ok) return null;
+    const searchData = await searchRes.json();
+
+    const photoName = searchData.places?.[0]?.photos?.[0]?.name;
+    if (!photoName) return null;
+
+    // 2. Fetch photo media — follow the redirect to get a key-free CDN URL
+    const photoRes = await fetch(
+      `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=800&key=${googleKey}`,
+      { redirect: 'follow' }
+    );
+    if (!photoRes.ok) return null;
+    return photoRes.url;
   } catch (_) {
     return null;
   }
@@ -117,29 +123,54 @@ exports.handler = async (event) => {
 
     const [rawOptions, ownerRows] = await Promise.all([optionsRes.json(), ownerRes.json()]);
 
-    const owner   = Array.isArray(ownerRows) ? ownerRows[0] : null;
+    const ownerProfile = Array.isArray(ownerRows) ? ownerRows[0] : null;
+
+    // Resolve display name: profile table first, then auth user_metadata (same
+    // fallback chain as useUser.ts in the mobile app).
+    let ownerName = ownerProfile?.display_name || ownerProfile?.username || null;
+    if (!ownerName && session.created_by) {
+      try {
+        const authRes = await fetch(
+          `${SUPABASE_URL}/auth/v1/admin/users/${session.created_by}`,
+          { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+        );
+        if (authRes.ok) {
+          const authUser = await authRes.json();
+          ownerName =
+            authUser.user_metadata?.full_name ||
+            authUser.user_metadata?.name      ||
+            null;
+        }
+      } catch (_) {}
+    }
+
+    const owner = { resolvedName: ownerName };
     const options = Array.isArray(rawOptions) ? rawOptions : [];
 
-    // 3. For options missing image_url, fetch a Google Places photo in parallel
-    const enriched = await Promise.all(
-      options.map(async (o) => {
-        if (o.image_url) return o;
-        const photoUrl = await fetchPlacePhoto(o.title, o.location, GOOGLE_KEY);
-        if (!photoUrl) return o;
+    // 3. Fetch option photos + destination hero photo in parallel
+    const destination = session.context?.destination || null;
+    const [enriched, heroImageUrl] = await Promise.all([
+      Promise.all(
+        options.map(async (o) => {
+          if (o.image_url && !o.image_url.includes('maps.googleapis.com')) return o;
+          const photoUrl = await fetchPlacePhoto(o.title, o.location, GOOGLE_KEY);
+          if (!photoUrl) return o;
 
-        // Cache back to Supabase so the next request is free (fire-and-forget)
-        fetch(
-          `${base}/planning_options?id=eq.${o.id}`,
-          {
-            method: 'PATCH',
-            headers: sbHeaders,
-            body: JSON.stringify({ image_url: photoUrl }),
-          }
-        ).catch(() => {});
+          // Cache back to Supabase so the next request is free (fire-and-forget)
+          fetch(
+            `${base}/planning_options?id=eq.${o.id}`,
+            {
+              method: 'PATCH',
+              headers: sbHeaders,
+              body: JSON.stringify({ image_url: photoUrl }),
+            }
+          ).catch(() => {});
 
-        return { ...o, image_url: photoUrl };
-      })
-    );
+          return { ...o, image_url: photoUrl };
+        })
+      ),
+      fetchPlacePhoto(destination, null, GOOGLE_KEY),
+    ]);
 
     // 4. Prefer decided items; fall back to all if none decided
     const decided     = enriched.filter((o) => o.status === 'decided');
@@ -160,12 +191,13 @@ exports.handler = async (event) => {
       statusCode: 200,
       headers: { ...CORS, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        sessionId:   session.id,
-        title:       session.title,
-        sessionType: session.session_type,
-        context:     session.context || {},
-        ownerName:   owner?.display_name || owner?.username || 'A Qulture user',
-        options:     displayOpts,
+        sessionId:    session.id,
+        title:        session.title,
+        sessionType:  session.session_type,
+        context:      session.context || {},
+        ownerName:    owner.resolvedName || 'A Qulture user',
+        heroImageUrl: heroImageUrl || null,
+        options:      displayOpts,
       }),
     };
   } catch (err) {
