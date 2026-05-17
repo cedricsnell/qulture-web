@@ -4,612 +4,832 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="apple-itunes-app" content="app-id=6759091761" />
-  <title>Qulture — Shared Plan</title>
-  <meta name="description" content="A plan shared with you on Qulture." />
 
-  <meta property="og:title" content="Shared plan on Qulture" />
-  <meta property="og:description" content="Someone shared a plan with you." />
-  <meta property="og:site_name" content="Qulture" />
-  <meta property="og:type" content="website" />
+  <!-- Social / OG (overridden by JS once data loads) -->
+  <meta id="og-title"       property="og:title"       content="A Qulture Plan" />
+  <meta id="og-desc"        property="og:description"  content="View this collaborative plan on Qulture." />
+  <meta id="og-image"       property="og:image"        content="https://qulture.app/og-default.png" />
+  <meta                     property="og:type"         content="website" />
+  <meta                     property="og:site_name"    content="Qulture" />
+  <meta                     name="twitter:card"        content="summary_large_image" />
 
+  <title>Qulture — View Plan</title>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #0a0a0f;
-      --bg-card: #13131a;
-      --bg-item: #18181f;
-      --primary: #7c3aed;
-      --primary-light: #a78bfa;
-      --pink: #ec4899;
-      --green: #10b981;
-      --gold: #f59e0b;
-      --text: #f8f8ff;
-      --text-secondary: #a0a0b8;
-      --text-tertiary: #606070;
-      --border: rgba(255,255,255,0.07);
-      --border-hover: rgba(167,139,250,0.3);
+      --bg:        #080810;
+      --surf:      #10101a;
+      --surf2:     #18182a;
+      --border:    rgba(255,255,255,0.07);
+      --border2:   rgba(255,255,255,0.12);
+      --text:      #f0f0f5;
+      --text2:     rgba(240,240,245,0.55);
+      --text3:     rgba(240,240,245,0.3);
+      --purple:    #7c3aed;
+      --pink:      #ec4899;
+      --grad:      linear-gradient(135deg,#7c3aed,#ec4899);
+      --gold:      #f59e0b;
+      --green:     #10b981;
+      --blue:      #3b82f6;
+      --coral:     #f97316;
+      --nav-h:     58px;
+      --max-w:     680px;
+      --r:         16px;
     }
 
-    html { scroll-behavior: smooth; }
-
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display',
+                   'Segoe UI', Helvetica Neue, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
-    /* ── Nav ── */
+    /* ── NAV ──────────────────────────────────────── */
     .nav {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 24px;
-      background: rgba(10,10,15,0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      position: fixed; top:0; left:0; right:0; z-index:100;
+      height: var(--nav-h);
+      display: flex; align-items: center;
+      padding: 0 20px;
+      background: rgba(8,8,16,0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
     }
-
+    .nav-inner {
+      max-width: var(--max-w); width:100%;
+      margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between;
+    }
     .nav-logo {
-      font-size: 20px;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--primary-light), var(--pink));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-decoration: none;
-      letter-spacing: -0.3px;
+      display:flex; align-items:center; gap:9px;
+      text-decoration:none; color:var(--text);
+      font-weight:800; font-size:17px; letter-spacing:-0.4px;
+    }
+    .nav-logo-icon {
+      width:30px; height:30px;
+      background: var(--grad);
+      border-radius:8px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:14px; line-height:1;
+    }
+    .nav-cta {
+      display:inline-flex; align-items:center; gap:5px;
+      background: var(--grad);
+      color:#fff; text-decoration:none;
+      font-size:13px; font-weight:700; letter-spacing:0.1px;
+      padding:7px 15px; border-radius:20px;
+      transition:opacity .15s, transform .15s;
+    }
+    .nav-cta:hover { opacity:.88; transform:translateY(-1px); }
+
+    /* ── HERO ─────────────────────────────────────── */
+    .hero {
+      position:relative;
+      padding: calc(var(--nav-h) + 52px) 20px 52px;
+      min-height:380px;
+      display:flex; align-items:flex-end;
+      overflow:hidden;
+    }
+    .hero-bg-base {
+      position:absolute; inset:0;
+      background:
+        radial-gradient(ellipse 90% 70% at 50% -10%, rgba(124,58,237,.4) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 50% at 85% 20%, rgba(236,72,153,.22) 0%, transparent 55%),
+        var(--bg);
+    }
+    .hero-bg-photo {
+      position:absolute; inset:0;
+      background-size:cover; background-position:center;
+      opacity:0; transition:opacity .8s ease;
+    }
+    .hero-bg-photo.visible { opacity:.2; }
+    .hero-bg-fade {
+      position:absolute; inset:0;
+      background:linear-gradient(to bottom,
+        rgba(8,8,16,.15) 0%,
+        rgba(8,8,16,.55) 50%,
+        rgba(8,8,16,.95) 85%,
+        var(--bg) 100%);
+    }
+    .hero-content {
+      position:relative;
+      width:100%; max-width:var(--max-w); margin:0 auto;
+    }
+    .hero-badges {
+      display:flex; gap:8px; flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+    .badge {
+      display:inline-flex; align-items:center; gap:5px;
+      font-size:10.5px; font-weight:700;
+      letter-spacing:.7px; text-transform:uppercase;
+      padding:4px 11px; border-radius:20px;
+      border:1px solid var(--border2);
+      color:var(--text2); background:rgba(255,255,255,.05);
+    }
+    .badge.trip     { border-color:rgba(59,130,246,.4);  color:#93c5fd; background:rgba(59,130,246,.1);  }
+    .badge.dining   { border-color:rgba(249,115,22,.4);  color:#fdba74; background:rgba(249,115,22,.1);  }
+    .badge.activity { border-color:rgba(16,185,129,.4);  color:#6ee7b7; background:rgba(16,185,129,.1);  }
+    .badge.event    { border-color:rgba(245,158,11,.4);  color:#fcd34d; background:rgba(245,158,11,.1);  }
+    .badge.plan     { border-color:rgba(124,58,237,.4);  color:#c4b5fd; background:rgba(124,58,237,.1);  }
+
+    .hero h1 {
+      font-size:clamp(26px,8vw,44px);
+      font-weight:800; letter-spacing:-1px; line-height:1.08;
+      margin-bottom:14px;
+    }
+    .hero-meta {
+      display:flex; align-items:center; gap:7px;
+      font-size:13.5px; color:var(--text2);
+      flex-wrap:wrap; margin-bottom:14px;
+    }
+    .hero-meta .dot { color:var(--text3); }
+    .hero-meta strong { color:var(--text); font-weight:600; }
+    .hero-context {
+      display:flex; gap:8px; flex-wrap:wrap;
+      margin-bottom:28px;
+    }
+    .ctx-chip {
+      font-size:12px; color:var(--text2);
+      background:rgba(255,255,255,.06);
+      border:1px solid var(--border);
+      border-radius:20px; padding:4px 12px;
+    }
+    .hero-btn {
+      display:inline-flex; align-items:center; gap:8px;
+      background: var(--grad);
+      color:#fff; border:none; border-radius:14px;
+      padding:14px 26px;
+      font-size:16px; font-weight:700; letter-spacing:-0.2px;
+      cursor:pointer; text-decoration:none;
+      transition:transform .15s, opacity .15s;
+    }
+    .hero-btn:hover  { transform:translateY(-2px); opacity:.92; }
+    .hero-btn:active { transform:translateY(0); }
+    .hero-btn .arr   { opacity:.8; font-size:18px; }
+
+    /* ── PLACES ───────────────────────────────────── */
+    .places-section { padding: 0 20px 140px; }
+    .places-inner {
+      max-width: var(--max-w); margin:0 auto;
     }
 
-    .nav-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: linear-gradient(135deg, var(--primary), var(--pink));
-      color: #fff;
-      text-decoration: none;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      transition: opacity 0.2s, transform 0.15s;
-      white-space: nowrap;
-    }
-    .nav-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-
-    /* ── Page wrapper ── */
-    .page {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 0 16px 80px;
+    .section-eyebrow {
+      font-size:10.5px; font-weight:700;
+      letter-spacing:1.8px; text-transform:uppercase;
+      color:var(--text3); margin-bottom:24px; padding-top:4px;
     }
 
-    /* ── States ── */
-    .state-center {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 60vh;
-      text-align: center;
-      gap: 12px;
-      padding: 40px 24px;
+    /* Day group */
+    .day-group { margin-bottom:4px; }
+    .day-header {
+      display:flex; align-items:center; gap:12px;
+      margin:36px 0 14px;
+    }
+    .day-header:first-child { margin-top:0; }
+    .day-label {
+      font-size:12px; font-weight:700;
+      letter-spacing:1px; text-transform:uppercase;
+      color:var(--purple); white-space:nowrap;
+    }
+    .day-line { flex:1; height:1px; background:var(--border); }
+
+    /* Category group */
+    .cat-group { margin-bottom:4px; }
+    .cat-header {
+      display:flex; align-items:center; gap:10px;
+      margin:32px 0 12px;
+    }
+    .cat-header:first-child { margin-top:0; }
+    .cat-emoji { font-size:20px; line-height:1; }
+    .cat-title { font-size:17px; font-weight:700; letter-spacing:-.2px; }
+    .cat-count { font-size:12px; color:var(--text3); }
+
+    /* Place card */
+    .place-card {
+      background: var(--surf);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      margin-bottom:10px;
+      transition: transform .15s, border-color .15s, box-shadow .15s;
+    }
+    .place-card:hover {
+      transform:translateY(-2px);
+      border-color: var(--border2);
+      box-shadow: 0 8px 32px rgba(0,0,0,.35);
+    }
+    .place-card.img-card { display:flex; }
+
+    /* Thumbnail */
+    .place-thumb {
+      width:110px; min-width:110px;
+      background: var(--surf2);
+      position:relative; overflow:hidden;
+    }
+    @media(min-width:460px) {
+      .place-thumb { width:140px; min-width:140px; }
+    }
+    .place-thumb img {
+      position:absolute; inset:0;
+      width:100%; height:100%; object-fit:cover;
+      transition:transform .3s;
+    }
+    .place-card:hover .place-thumb img { transform:scale(1.04); }
+    .place-thumb-ph {
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:32px; color:var(--text3);
     }
 
-    .state-icon { font-size: 52px; margin-bottom: 8px; }
+    /* Card body */
+    .place-body {
+      flex:1; padding:15px 16px; min-width:0;
+      display:flex; flex-direction:column; justify-content:center;
+    }
+    .place-card:not(.img-card) .place-body { padding:16px 18px; }
 
-    .state-title {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text);
+    .place-name-row {
+      display:flex; align-items:flex-start;
+      justify-content:space-between; gap:8px;
+      margin-bottom:5px;
+    }
+    .place-name {
+      font-size:15px; font-weight:700;
+      letter-spacing:-.2px; line-height:1.25; color:var(--text);
+    }
+    .status-pip {
+      width:7px; height:7px; min-width:7px;
+      border-radius:50%; margin-top:5px;
+    }
+    .status-pip.decided     { background:#10b981; }
+    .status-pip.considering { background:#f59e0b; }
+
+    .place-meta {
+      display:flex; align-items:center; flex-wrap:wrap;
+      gap:5px; font-size:12px; color:var(--text2);
+      margin-bottom:6px;
+    }
+    .place-meta .sep { color:var(--text3); }
+    .price-chip {
+      font-size:11px; font-weight:600;
+      padding:2px 7px; border-radius:5px;
+      background:rgba(245,158,11,.12);
+      color:#fbbf24;
+      border:1px solid rgba(245,158,11,.22);
     }
 
-    .state-subtitle {
-      font-size: 15px;
-      color: var(--text-secondary);
-      max-width: 320px;
-      line-height: 1.6;
+    .place-desc {
+      font-size:12.5px; color:var(--text2); line-height:1.55;
+      display:-webkit-box;
+      -webkit-line-clamp:2; -webkit-box-orient:vertical;
+      overflow:hidden;
+      margin-bottom:10px;
     }
 
+    .place-actions { display:flex; gap:8px; flex-wrap:wrap; }
+
+    .view-btn {
+      display:inline-flex; align-items:center; gap:5px;
+      font-size:12px; font-weight:600;
+      color:#c4b5fd; text-decoration:none;
+      padding:5px 11px; border-radius:8px;
+      background:rgba(124,58,237,.12);
+      border:1px solid rgba(124,58,237,.25);
+      transition:background .15s;
+      white-space:nowrap;
+    }
+    .view-btn:hover { background:rgba(124,58,237,.22); }
+
+    /* Empty state */
+    .empty-state {
+      text-align:center; padding:52px 20px;
+      color:var(--text3);
+    }
+    .empty-icon  { font-size:44px; margin-bottom:14px; }
+    .empty-title {
+      font-size:18px; font-weight:700;
+      color:var(--text2); margin-bottom:10px;
+    }
+    .empty-sub {
+      font-size:14px; line-height:1.55;
+      max-width:280px; margin:0 auto 28px;
+      color:var(--text3);
+    }
+
+    /* ── LOADING ──────────────────────────────────── */
+    .loading-wrap {
+      min-height:100vh; padding-top:var(--nav-h);
+      display:flex; align-items:center; justify-content:center;
+      flex-direction:column; gap:16px;
+    }
     .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--border);
-      border-top-color: var(--primary-light);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 8px;
+      width:36px; height:36px;
+      border:3px solid rgba(124,58,237,.2);
+      border-top-color:#7c3aed;
+      border-radius:50%;
+      animation:spin .75s linear infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-txt { font-size:14px; color:var(--text3); }
 
-    /* ── Plan header ── */
-    .plan-header {
-      text-align: center;
-      padding: 40px 0 28px;
+    /* ── ERROR ────────────────────────────────────── */
+    .error-wrap {
+      min-height:100vh; padding:calc(var(--nav-h) + 60px) 24px 60px;
+      display:flex; align-items:center; justify-content:center;
+      flex-direction:column; gap:14px; text-align:center;
     }
-
-    .plan-icon {
-      width: 72px;
-      height: 72px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(236,72,153,0.15));
-      border: 1px solid rgba(124,58,237,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      margin: 0 auto 20px;
+    .error-icon  { font-size:42px; }
+    .error-title { font-size:22px; font-weight:800; letter-spacing:-.3px; }
+    .error-sub   {
+      font-size:14px; color:var(--text2);
+      max-width:300px; line-height:1.55;
     }
 
-    .plan-title {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
+    /* ── APP PROMO ────────────────────────────────── */
+    .promo {
+      background:var(--surf);
+      border-top:1px solid var(--border);
+      padding:48px 24px;
+      text-align:center;
+    }
+    .promo-inner { max-width:380px; margin:0 auto; }
+    .promo-icon {
+      width:60px; height:60px;
+      background: var(--grad);
+      border-radius:18px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:26px; margin:0 auto 18px;
+    }
+    .promo-wordmark {
+      font-size:22px; font-weight:800; letter-spacing:-.4px;
+      margin-bottom:10px;
+      background: var(--grad);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .promo-tagline {
+      font-size:14px; color:var(--text2);
+      line-height:1.55; margin-bottom:28px;
+    }
+    .store-badge { display:inline-block; }
+    .store-badge img { height:46px; }
+    .promo-credit {
+      margin-top:28px; font-size:12px; color:var(--text3);
     }
 
-    .plan-meta {
-      font-size: 14px;
-      color: var(--text-secondary);
-      margin-bottom: 28px;
+    /* ── BOTTOM BAR ───────────────────────────────── */
+    .bottom-bar {
+      position:fixed; bottom:0; left:0; right:0; z-index:50;
+      background:rgba(8,8,16,.9);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border-top:1px solid var(--border);
+      padding:12px 16px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      display:flex; gap:10px; align-items:center;
+      transform:translateY(100%);
+      transition:transform .35s cubic-bezier(.4,0,.2,1);
     }
+    .bottom-bar.up { transform:translateY(0); }
 
-    /* ── CTA buttons ── */
-    .btn-row {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 36px;
+    .bb-open {
+      flex:1; background: var(--grad);
+      color:#fff; border:none; border-radius:13px;
+      padding:13px 20px;
+      font-size:15px; font-weight:700;
+      cursor:pointer; text-align:center;
+      transition:opacity .15s;
     }
+    .bb-open:hover { opacity:.88; }
 
-    .btn-primary {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      background: linear-gradient(135deg, var(--primary), var(--pink));
-      color: #fff;
-      text-decoration: none;
-      padding: 16px 24px;
-      border-radius: 14px;
-      font-size: 16px;
-      font-weight: 700;
-      transition: opacity 0.2s, transform 0.15s;
-      box-shadow: 0 8px 24px rgba(124,58,237,0.3);
+    .bb-dl {
+      font-size:12px; font-weight:600;
+      color:var(--text2); text-decoration:none;
+      white-space:nowrap; padding:8px 4px;
     }
-    .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+    .bb-dl:hover { color:var(--text); }
 
-    .btn-secondary {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      color: var(--text);
-      text-decoration: none;
-      padding: 14px 24px;
-      border-radius: 14px;
-      font-size: 15px;
-      font-weight: 600;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .btn-secondary:hover {
-      border-color: var(--border-hover);
-      background: rgba(124,58,237,0.08);
-    }
-
-    /* ── Section / day label ── */
-    .section-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--text-tertiary);
-      margin: 28px 0 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    /* ── Option cards ── */
-    .options-list {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .option-card {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .option-card:last-child { border-bottom: none; }
-
-    .option-thumb {
-      width: 64px;
-      height: 64px;
-      border-radius: 12px;
-      overflow: hidden;
-      background: var(--bg-card);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-    }
-    .option-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .option-content { flex: 1; min-width: 0; }
-
-    .option-title-row {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 4px;
-    }
-
-    .option-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text);
-      line-height: 1.3;
-    }
-
-    .option-price {
-      font-size: 13px;
-      color: var(--text-tertiary);
-      font-weight: 500;
-      flex-shrink: 0;
-    }
-
-    .decided-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--green);
-      background: rgba(16,185,129,0.1);
-      border: 1px solid rgba(16,185,129,0.2);
-      border-radius: 6px;
-      padding: 2px 8px;
-      margin-bottom: 6px;
-    }
-
-    .option-location {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      color: var(--text-tertiary);
-      text-decoration: none;
-      margin-bottom: 4px;
-      transition: color 0.2s;
-    }
-    .option-location:hover { color: var(--primary-light); }
-
-    .option-location-text {
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .option-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      color: var(--primary-light);
-      text-decoration: none;
-      transition: opacity 0.2s;
-    }
-    .option-link:hover { opacity: 0.8; }
-
-    /* ── Acquisition footer ── */
-    .acq-card {
-      margin-top: 48px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 32px 24px;
-      text-align: center;
-    }
-
-    .acq-logo {
-      font-size: 18px;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--primary-light), var(--pink));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 8px;
-    }
-
-    .acq-tagline {
-      font-size: 15px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 20px;
-      max-width: 320px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .acq-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: linear-gradient(135deg, var(--primary), var(--pink));
-      color: #fff;
-      text-decoration: none;
-      padding: 14px 28px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 700;
-      transition: opacity 0.2s, transform 0.15s;
-      box-shadow: 0 6px 20px rgba(124,58,237,0.3);
-    }
-    .acq-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-
-    .acq-sub {
-      margin-top: 12px;
-      font-size: 12px;
-      color: var(--text-tertiary);
-    }
-
-    .hidden { display: none !important; }
-
-    @media (max-width: 400px) {
-      .btn-primary, .btn-secondary { font-size: 14px; padding: 14px 16px; }
-      .plan-title { font-size: 24px; }
-    }
+    /* Utility */
+    .hidden { display:none !important; }
   </style>
 </head>
 <body>
 
-  <nav class="nav">
-    <a class="nav-logo" href="https://qulture.app">Qulture</a>
-    <a class="nav-btn" href="https://apps.apple.com/app/id6759091761">
+<!-- ── NAV ──────────────────────────────────────────── -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="https://qulture.app" class="nav-logo">
+      <div class="nav-logo-icon">✦</div>
+      Qulture
+    </a>
+    <a href="https://apps.apple.com/app/id6759091761" class="nav-cta" target="_blank" rel="noopener">
       ↓ Get the App
     </a>
-  </nav>
-
-  <!-- Loading -->
-  <div class="page" id="state-loading">
-    <div class="state-center">
-      <div class="spinner"></div>
-      <p class="state-subtitle">Loading plan…</p>
-    </div>
   </div>
+</nav>
 
-  <!-- Not found -->
-  <div class="page hidden" id="state-not-found">
-    <div class="state-center">
-      <div class="state-icon">🔗</div>
-      <p class="state-title">Plan not found</p>
-      <p class="state-subtitle">This share link is invalid or has been removed.</p>
-    </div>
+<!-- ── LOADING ───────────────────────────────────────── -->
+<div id="loading-wrap" class="loading-wrap">
+  <div class="spinner"></div>
+  <div class="loading-txt">Loading plan…</div>
+</div>
+
+<!-- ── ERROR ─────────────────────────────────────────── -->
+<div id="error-wrap" class="error-wrap hidden">
+  <div class="error-icon">✦</div>
+  <div class="error-title">Plan not found</div>
+  <div class="error-sub">
+    This link may have expired or been revoked. Ask the planner to share it again.
   </div>
+  <a href="https://apps.apple.com/app/id6759091761"
+     class="hero-btn" style="margin-top:8px;"
+     target="_blank" rel="noopener">
+    Get Qulture Free <span class="arr">→</span>
+  </a>
+</div>
 
-  <!-- Loaded plan -->
-  <div class="page hidden" id="state-plan">
-    <div class="plan-header">
-      <div class="plan-icon" id="plan-icon">✨</div>
-      <h1 class="plan-title" id="plan-title">—</h1>
-      <p class="plan-meta" id="plan-meta">—</p>
+<!-- ── PLAN ──────────────────────────────────────────── -->
+<div id="plan-wrap" class="hidden">
 
-      <div class="btn-row">
-        <a class="btn-primary" id="open-in-app" href="#">
-          📱 Open in Qulture
-        </a>
-        <a class="btn-secondary" href="https://apps.apple.com/app/id6759091761">
-          ↓ Download Qulture — Free on the App Store
-        </a>
-      </div>
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero-bg-base"></div>
+    <div class="hero-bg-photo" id="hero-photo"></div>
+    <div class="hero-bg-fade"></div>
+    <div class="hero-content">
+      <div class="hero-badges" id="hero-badges"></div>
+      <h1 id="plan-title">—</h1>
+      <div class="hero-meta" id="hero-meta"></div>
+      <div class="hero-context" id="hero-ctx"></div>
+      <button class="hero-btn" onclick="openApp()">
+        Open in Qulture <span class="arr">→</span>
+      </button>
     </div>
+  </section>
 
-    <div id="options-container"></div>
+  <!-- Places -->
+  <section class="places-section">
+    <div class="places-inner" id="places-container">
+      <div class="section-eyebrow">The Plan</div>
+    </div>
+  </section>
 
-    <div class="acq-card">
-      <div class="acq-logo">Qulture</div>
-      <p class="acq-tagline">
+  <!-- Promo footer -->
+  <section class="promo">
+    <div class="promo-inner">
+      <div class="promo-icon">✦</div>
+      <div class="promo-wordmark">Qulture</div>
+      <div class="promo-tagline">
         Plan trips, dinners, and nights out with AI — together.
-      </p>
-      <a class="acq-btn" href="https://apps.apple.com/app/id6759091761">
-        Get Qulture — Free on iOS
+      </div>
+      <a href="https://apps.apple.com/app/id6759091761"
+         class="store-badge" target="_blank" rel="noopener">
+        <img
+          src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83"
+          alt="Download on the App Store"
+          loading="lazy"
+        />
       </a>
-      <p class="acq-sub">Made with ♥ by Proprius Labs</p>
+      <div class="promo-credit">Made with ♥ by Proprius Labs</div>
     </div>
-  </div>
+  </section>
+</div><!-- /plan-wrap -->
 
-  <script>
-    const APP_STORE = 'https://apps.apple.com/app/id6759091761';
+<!-- ── BOTTOM BAR ─────────────────────────────────────── -->
+<div class="bottom-bar" id="bottom-bar">
+  <button class="bb-open" onclick="openApp()">Open in Qulture</button>
+  <a href="https://apps.apple.com/app/id6759091761"
+     class="bb-dl" target="_blank" rel="noopener">↓ Free</a>
+</div>
 
-    const CATEGORY_ICONS = {
-      hotel: '🏨', restaurant: '🍽', activity: '🎯',
-      transport: '🚗', item: '🛍', general: '✨',
-    };
+<script>
+(function () {
+  'use strict';
 
-    const SESSION_TYPE_ICONS = {
-      trip: '✈️', dinner: '🍽', night_out: '🌃',
-      date: '💫', event: '🎉', general: '✨',
-    };
+  /* ── Config ─────────────────────────────────────── */
+  var SB_URL  = 'https://blqitgtdqtjoxkupolut.supabase.co';
+  var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
+                'eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscWl0Z3RkcXRqb3hrdXBvbHV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcyMDQzMDgsImV4cCI6MjA4Mjc4MDMwOH0.' +
+                'TiCwdaEpZEuRMWIBy4U-3IAyoccQo--rWrIS7Mmbn4M';
 
-    function showState(id) {
-      ['state-loading', 'state-not-found', 'state-plan'].forEach((s) => {
-        document.getElementById(s).classList.toggle('hidden', s !== id);
+  var CATS = {
+    hotel:      { e:'🏨', label:"Where You're Staying" },
+    restaurant: { e:'🍽️', label:'Dining'               },
+    activity:   { e:'🎯', label:'Activities'           },
+    transport:  { e:'✈️', label:'Getting There'        },
+    item:       { e:'🛍️', label:'What to Bring'       },
+    general:    { e:'✦',  label:'Highlights'           },
+  };
+
+  var TYPE_BADGE = {
+    travel:   { t:'Trip',     c:'trip'     },
+    dining:   { t:'Dining',   c:'dining'   },
+    activity: { t:'Activity', c:'activity' },
+    shopping: { t:'Shopping', c:'activity' },
+    event:    { t:'Event',    c:'event'    },
+    general:  { t:'Plan',     c:'plan'     },
+  };
+
+  /* ── State ───────────────────────────────────────── */
+  var token = null;
+
+  /* ── Helpers ─────────────────────────────────────── */
+  function $(id) { return document.getElementById(id); }
+  function show(id) { $(id).classList.remove('hidden'); }
+  function hide(id) { $(id).classList.add('hidden'); }
+
+  function esc(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+  function escAttr(s) {
+    return esc(s).replace(/'/g,'&#39;');
+  }
+
+  function safeUrl(s) {
+    if (!s) return null;
+    try {
+      var u = new URL(s);
+      return (u.protocol === 'https:' || u.protocol === 'http:') ? s : null;
+    } catch(_) { return null; }
+  }
+
+  function sbFetch(path) {
+    return fetch(SB_URL + path, {
+      headers: {
+        'apikey':        SB_ANON,
+        'Authorization': 'Bearer ' + SB_ANON,
+        'Content-Type':  'application/json',
+      },
+    }).then(function(r) { return r.json(); });
+  }
+
+  /* ── Open app ────────────────────────────────────── */
+  window.openApp = function() {
+    if (!token) return;
+    window.location.href = 'qulture://shared-plan/' + token;
+  };
+
+  /* ── Render hero ─────────────────────────────────── */
+  function renderHero(session, options, ownerName) {
+    var ctx  = session.context || {};
+    var type = TYPE_BADGE[session.session_type] || TYPE_BADGE.general;
+
+    // Badges
+    var badgeHtml = '<span class="badge ' + type.c + '">' + esc(type.t) + '</span>';
+    if (ctx.occasion) badgeHtml += ' <span class="badge">' + esc(ctx.occasion) + '</span>';
+    $('hero-badges').innerHTML = badgeHtml;
+
+    // Title
+    $('plan-title').textContent = session.title || 'Untitled Plan';
+    document.title = (session.title || 'Untitled Plan') + ' — Qulture';
+
+    // Update OG
+    $('og-title').content  = (session.title || 'A Qulture Plan') + ' — Qulture';
+    $('og-desc').content   = 'A plan with ' + options.length + ' places, shared on Qulture.';
+
+    // Meta row
+    var cnt = options.length;
+    var metaHtml =
+      '<span>By <strong>' + esc(ownerName) + '</strong></span>' +
+      '<span class="dot">·</span>' +
+      '<span>' + cnt + ' ' + (cnt === 1 ? 'place' : 'places') + '</span>';
+    if (ctx.dates) metaHtml += '<span class="dot">·</span><span>' + esc(ctx.dates) + '</span>';
+    $('hero-meta').innerHTML = metaHtml;
+
+    // Context chips
+    var chips = [];
+    if (ctx.destination) chips.push('📍 ' + ctx.destination);
+    if (ctx.occasion && !ctx.destination) chips.push('✨ ' + ctx.occasion);
+    $('hero-ctx').innerHTML = chips.map(function(c) {
+      return '<span class="ctx-chip">' + esc(c) + '</span>';
+    }).join('');
+
+    // Hero background from first place with an image
+    var first = options.find(function(o) { return o.image_url; });
+    if (first) {
+      var img = new Image();
+      img.onload = function() {
+        var el = $('hero-photo');
+        el.style.backgroundImage = 'url(' + encodeURI(first.image_url) + ')';
+        el.classList.add('visible');
+        $('og-image').content = first.image_url;
+      };
+      img.src = first.image_url;
+    }
+  }
+
+  /* ── Render a single place card ──────────────────── */
+  function makeCard(opt) {
+    var hasImg = !!opt.image_url;
+    var cat    = CATS[opt.category] || CATS.general;
+    var url    = safeUrl(opt.url);
+
+    var card = document.createElement('div');
+    card.className = 'place-card' + (hasImg ? ' img-card' : '');
+
+    var thumbHtml = '';
+    if (hasImg) {
+      thumbHtml =
+        '<div class="place-thumb">' +
+          '<img src="' + escAttr(opt.image_url) + '"' +
+               ' alt="' + escAttr(opt.title) + '"' +
+               ' loading="lazy"' +
+               ' onerror="this.parentNode.innerHTML=\'<div class=place-thumb-ph>' + cat.e + '</div>\'" />' +
+        '</div>';
+    }
+
+    var metaParts = [];
+    if (opt.location)    metaParts.push('📍 ' + esc(opt.location));
+    if (opt.price_range) metaParts.push('<span class="price-chip">' + esc(opt.price_range) + '</span>');
+
+    var actionsHtml = '';
+    if (url) {
+      actionsHtml =
+        '<div class="place-actions">' +
+          '<a href="' + escAttr(url) + '" class="view-btn"' +
+             ' target="_blank" rel="noopener noreferrer">View →</a>' +
+        '</div>';
+    }
+
+    card.innerHTML =
+      thumbHtml +
+      '<div class="place-body">' +
+        '<div class="place-name-row">' +
+          '<div class="place-name">' + esc(opt.title) + '</div>' +
+          '<div class="status-pip ' + (opt.status === 'decided' ? 'decided' : 'considering') + '"></div>' +
+        '</div>' +
+        (metaParts.length
+          ? '<div class="place-meta">' + metaParts.join('<span class="sep"> · </span>') + '</div>'
+          : '') +
+        (opt.description
+          ? '<div class="place-desc">' + esc(opt.description) + '</div>'
+          : '') +
+        actionsHtml +
+      '</div>';
+
+    return card;
+  }
+
+  /* ── Render by day ───────────────────────────────── */
+  function renderByDay(opts, container) {
+    var map = {}, order = [];
+    opts.forEach(function(o) {
+      var k = o.day_label || 'Highlights';
+      if (!map[k]) { map[k] = []; order.push(k); }
+      map[k].push(o);
+    });
+    order.forEach(function(label) {
+      var wrap = document.createElement('div');
+      wrap.className = 'day-group';
+      wrap.innerHTML =
+        '<div class="day-header">' +
+          '<span class="day-label">' + esc(label) + '</span>' +
+          '<div class="day-line"></div>' +
+        '</div>';
+      map[label].forEach(function(o) { wrap.appendChild(makeCard(o)); });
+      container.appendChild(wrap);
+    });
+  }
+
+  /* ── Render by category ──────────────────────────── */
+  function renderByCat(opts, container) {
+    var map = {}, order = [];
+    var CAT_ORDER = ['hotel','restaurant','activity','transport','item','general'];
+    opts.forEach(function(o) {
+      var k = o.category || 'general';
+      if (!map[k]) { map[k] = []; order.push(k); }
+      map[k].push(o);
+    });
+    order.sort(function(a,b) {
+      return (CAT_ORDER.indexOf(a) + 1 || 99) - (CAT_ORDER.indexOf(b) + 1 || 99);
+    });
+    var multi = order.length > 1;
+    order.forEach(function(cat) {
+      var cfg  = CATS[cat] || CATS.general;
+      var wrap = document.createElement('div');
+      wrap.className = 'cat-group';
+      if (multi) {
+        wrap.innerHTML =
+          '<div class="cat-header">' +
+            '<span class="cat-emoji">' + cfg.e + '</span>' +
+            '<span class="cat-title">' + esc(cfg.label) + '</span>' +
+            '<span class="cat-count">(' + map[cat].length + ')</span>' +
+          '</div>';
+      }
+      map[cat].forEach(function(o) { wrap.appendChild(makeCard(o)); });
+      container.appendChild(wrap);
+    });
+  }
+
+  /* ── Main render ─────────────────────────────────── */
+  function renderPlan(session, options, ownerName) {
+    renderHero(session, options, ownerName);
+
+    var container = $('places-container');
+
+    if (options.length === 0) {
+      container.insertAdjacentHTML('beforeend',
+        '<div class="empty-state">' +
+          '<div class="empty-icon">✦</div>' +
+          '<div class="empty-title">No places yet</div>' +
+          '<div class="empty-sub">The planner is still building this itinerary. ' +
+            'Open it in Qulture to see it as it comes together.</div>' +
+          '<button class="hero-btn" onclick="openApp()">Open in Qulture <span class="arr">→</span></button>' +
+        '</div>'
+      );
+      return;
+    }
+
+    var hasDays = options.some(function(o) { return !!o.day_label; });
+    if (hasDays) {
+      renderByDay(options, container);
+    } else {
+      renderByCat(options, container);
+    }
+  }
+
+  /* ── Load ────────────────────────────────────────── */
+  function load() {
+    var m = location.pathname.match(/\/shared-plan\/([A-Za-z0-9_]+)/);
+    token = m ? m[1] : null;
+
+    if (!token) {
+      hide('loading-wrap');
+      show('error-wrap');
+      return;
+    }
+
+    sbFetch(
+      '/rest/v1/planning_sessions' +
+      '?share_token=eq.' + encodeURIComponent(token) +
+      '&select=id,title,session_type,context,created_by'
+    ).then(function(sessions) {
+      if (!sessions || sessions.length === 0) throw new Error('not found');
+
+      var s = sessions[0];
+      return Promise.all([
+        sbFetch(
+          '/rest/v1/planning_options' +
+          '?session_id=eq.' + encodeURIComponent(s.id) +
+          '&status=in.(decided,considering)' +
+          '&select=id,title,category,day_label,location,price_range,description,image_url,url,status' +
+          '&order=sort_order.asc'
+        ),
+        sbFetch(
+          '/rest/v1/user_profiles' +
+          '?id=eq.' + encodeURIComponent(s.created_by) +
+          '&select=display_name,username'
+        ),
+      ]).then(function(results) {
+        return { session: s, options: results[0] || [], profiles: results[1] || [] };
       });
-    }
+    }).then(function(data) {
+      var s       = data.session;
+      var rawOpts = data.options;
+      var profile = data.profiles[0] || null;
+      var owner   = (profile && (profile.display_name || profile.username)) || 'A Qulture user';
 
-    function getToken() {
-      const parts = window.location.pathname.split('/').filter(Boolean);
-      return parts[parts.length - 1] || null;
-    }
+      // Prefer decided options; fall back to all if none decided
+      var decided = rawOpts.filter(function(o) { return o.status === 'decided'; });
+      var display = decided.length > 0 ? decided : rawOpts;
 
-    function buildOptionCard(opt) {
-      const emoji = CATEGORY_ICONS[opt.category] || '✨';
-      const card = document.createElement('div');
-      card.className = 'option-card';
+      renderPlan(s, display, owner);
 
-      // Thumbnail
-      const thumb = document.createElement('div');
-      thumb.className = 'option-thumb';
-      if (opt.imageUrl) {
-        const img = document.createElement('img');
-        img.src = opt.imageUrl;
-        img.alt = opt.title;
-        img.onerror = () => { thumb.textContent = emoji; };
-        thumb.appendChild(img);
-      } else {
-        thumb.textContent = emoji;
+      hide('loading-wrap');
+      show('plan-wrap');
+
+      // Bottom bar slides up on scroll (or after 1 s if already at top)
+      var barShown = false;
+      function showBar() {
+        if (barShown) return;
+        barShown = true;
+        $('bottom-bar').classList.add('up');
       }
-      card.appendChild(thumb);
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 80) showBar();
+      }, { passive:true });
+      setTimeout(showBar, 1200);
 
-      // Content
-      const content = document.createElement('div');
-      content.className = 'option-content';
+    }).catch(function(err) {
+      console.error('Qulture share load error:', err);
+      hide('loading-wrap');
+      show('error-wrap');
+    });
+  }
 
-      // Title + price
-      const titleRow = document.createElement('div');
-      titleRow.className = 'option-title-row';
-      const title = document.createElement('span');
-      title.className = 'option-title';
-      title.textContent = opt.title;
-      titleRow.appendChild(title);
-      if (opt.priceRange) {
-        const price = document.createElement('span');
-        price.className = 'option-price';
-        price.textContent = opt.priceRange;
-        titleRow.appendChild(price);
-      }
-      content.appendChild(titleRow);
-
-      // Decided badge
-      if (opt.status === 'decided') {
-        const badge = document.createElement('div');
-        badge.className = 'decided-badge';
-        badge.textContent = '✓ Chosen';
-        content.appendChild(badge);
-      }
-
-      // Location
-      if (opt.location) {
-        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(opt.location)}`;
-        const loc = document.createElement('a');
-        loc.className = 'option-location';
-        loc.href = mapsUrl;
-        loc.target = '_blank';
-        loc.rel = 'noopener noreferrer';
-        loc.innerHTML = `<span>📍</span><span class="option-location-text">${opt.location}</span>`;
-        content.appendChild(loc);
-      }
-
-      // External link
-      if (opt.url) {
-        const link = document.createElement('a');
-        link.className = 'option-link';
-        link.href = opt.url;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.innerHTML = '<span>🔗</span><span>View details</span>';
-        content.appendChild(link);
-      }
-
-      card.appendChild(content);
-      return card;
-    }
-
-    async function load() {
-      const token = getToken();
-      if (!token || token === 'index.html') {
-        showState('state-not-found');
-        return;
-      }
-
-      try {
-        const res = await fetch(`/.netlify/functions/get-shared-plan?token=${encodeURIComponent(token)}`);
-
-        if (res.status === 404) { showState('state-not-found'); return; }
-        if (!res.ok) { showState('state-not-found'); return; }
-
-        const data = await res.json();
-        if (data.error) { showState('state-not-found'); return; }
-
-        // Populate header
-        const typeIcon = SESSION_TYPE_ICONS[data.sessionType] || '✨';
-        document.getElementById('plan-icon').textContent = typeIcon;
-        document.getElementById('plan-title').textContent = data.title;
-        document.getElementById('plan-meta').textContent =
-          `Planned by ${data.ownerName} · ${data.options.length} ${data.options.length === 1 ? 'item' : 'items'}`;
-
-        document.title = `${data.title} — Qulture`;
-
-        // Deep link
-        const deepLink = `qulture://shared-plan/${token}`;
-        document.getElementById('open-in-app').href = deepLink;
-
-        // Render options — group by dayLabel if present
-        const container = document.getElementById('options-container');
-        const hasDays = data.options.some((o) => o.dayLabel);
-
-        if (hasDays) {
-          const groups = {};
-          const order = [];
-          for (const o of data.options) {
-            const key = o.dayLabel || 'Other';
-            if (!groups[key]) { groups[key] = []; order.push(key); }
-            groups[key].push(o);
-          }
-          for (const day of order) {
-            const label = document.createElement('p');
-            label.className = 'section-label';
-            label.textContent = day;
-            container.appendChild(label);
-            const list = document.createElement('div');
-            list.className = 'options-list';
-            groups[day].forEach((o) => list.appendChild(buildOptionCard(o)));
-            container.appendChild(list);
-          }
-        } else {
-          const label = document.createElement('p');
-          label.className = 'section-label';
-          label.textContent = `${data.options.length} ${data.options.length === 1 ? 'Place' : 'Places'}`;
-          container.appendChild(label);
-          const list = document.createElement('div');
-          list.className = 'options-list';
-          data.options.forEach((o) => list.appendChild(buildOptionCard(o)));
-          container.appendChild(list);
-        }
-
-        showState('state-plan');
-
-        // Auto deep-link on mobile
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-          setTimeout(() => { window.location.href = deepLink; }, 1200);
-        }
-
-      } catch {
-        showState('state-not-found');
-      }
-    }
-
-    load();
-  </script>
+  load();
+})();
+</script>
 </body>
 </html>
