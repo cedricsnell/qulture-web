@@ -504,10 +504,6 @@
 (function () {
   'use strict';
 
-  var SB_URL  = 'https://blqitgtdqtjoxkupolut.supabase.co';
-  var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
-                'eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscWl0Z3RkcXRqb3hrdXBvbHV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcyMDQzMDgsImV4cCI6MjA4Mjc4MDMwOH0.' +
-                'TiCwdaEpZEuRMWIBy4U-3IAyoccQo--rWrIS7Mmbn4M';
 
   var CATS = {
     hotel:      { e:'🏨', label:'Stay'        },
@@ -554,17 +550,7 @@
     return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(loc);
   }
 
-  function sbFetch(path) {
-    return fetch(SB_URL + path, {
-      headers:{
-        'apikey':        SB_ANON,
-        'Authorization': 'Bearer ' + SB_ANON,
-        'Content-Type':  'application/json',
-      },
-    }).then(function(r){ return r.json(); });
-  }
-
-  // US state abbreviation → full name for Wikipedia title disambiguation
+// US state abbreviation → full name for Wikipedia title disambiguation
   var STATE_MAP = {
     'AL':'Alabama','AK':'Alaska','AZ':'Arizona','AR':'Arkansas','CA':'California',
     'CO':'Colorado','CT':'Connecticut','DE':'Delaware','FL':'Florida','GA':'Georgia',
@@ -830,77 +816,75 @@
   function load() {
     var m = location.pathname.match(/\/shared-plan\/([A-Za-z0-9_]+)/);
     token = m ? m[1] : null;
-
     if (!token) { hide('loading-wrap'); show('error-wrap'); return; }
 
-    sbFetch(
-      '/rest/v1/planning_sessions' +
-      '?share_token=eq.' + encodeURIComponent(token) +
-      '&select=id,title,session_type,context,created_by'
-    ).then(function(sessions){
-      if (!sessions || sessions.length === 0) throw new Error('not found');
-      var s   = sessions[0];
-      var ctx = s.context || {};
+    fetch('/.netlify/functions/get-shared-plan?token=' + encodeURIComponent(token))
+      .then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function(data){
+        if (data.error) throw new Error(data.error);
 
-      return Promise.all([
-        sbFetch(
-          '/rest/v1/planning_options' +
-          '?session_id=eq.' + encodeURIComponent(s.id) +
-          '&status=in.(decided,considering)' +
-          '&select=id,title,category,day_label,location,price_range,description,image_url,url,status' +
-          '&order=sort_order.asc'
-        ),
-        sbFetch(
-          '/rest/v1/user_profiles' +
-          '?id=eq.' + encodeURIComponent(s.created_by) +
-          '&select=display_name,username'
-        ),
-        fetchWikiPhoto(ctx.destination, null),
-      ]).then(function(results){
-        var opts      = results[0] || [];
-        var profiles  = results[1] || [];
-        var cityPhoto = results[2];
+        var ctx = data.context || {};
 
-        // Batch-fetch Wikipedia images for any option missing an image_url
+        // Normalize camelCase function response → snake_case used by render helpers
+        var opts = (data.options || []).map(function(o){
+          return {
+            id:          o.id,
+            title:       o.title,
+            category:    o.category,
+            day_label:   o.dayLabel,
+            location:    o.location,
+            price_range: o.priceRange,
+            description: o.description,
+            image_url:   o.imageUrl,
+            url:         o.url,
+            status:      o.status,
+          };
+        });
+
+        var session = {
+          title:        data.title,
+          session_type: data.sessionType,
+          context:      ctx,
+        };
+
+        // For options still missing an image after Google Places, try Wikipedia
         var poiFetches = opts.map(function(o){
           if (o.image_url) return Promise.resolve(o.image_url);
           return fetchWikiPhoto(o.title, o.location);
         });
 
-        return Promise.all(poiFetches).then(function(photos){
-          var enriched = opts.map(function(o, i){
+        // City hero photo via Wikipedia (function doesn't handle this)
+        var cityFetch = fetchWikiPhoto(ctx.destination, null);
+
+        return Promise.all([Promise.all(poiFetches), cityFetch]).then(function(results){
+          var photos    = results[0];
+          var cityPhoto = results[1];
+          var enriched  = opts.map(function(o, i){
             return photos[i] ? Object.assign({}, o, { image_url: photos[i] }) : o;
           });
-          return { session:s, options:enriched, profiles:profiles, cityPhoto:cityPhoto };
+          return { session: session, options: enriched, owner: data.ownerName, cityPhoto: cityPhoto };
         });
+      })
+      .then(function(data){
+        renderPlan(data.session, data.options, data.owner, data.cityPhoto);
+
+        hide('loading-wrap');
+        show('plan-wrap');
+
+        var barShown = false;
+        function showBar() {
+          if (barShown) return;
+          barShown = true;
+          $('bottom-bar').classList.add('up');
+        }
+        window.addEventListener('scroll', function(){ if (window.scrollY > 80) showBar(); }, { passive:true });
+        setTimeout(showBar, 1200);
+      })
+      .catch(function(err){
+        console.error('Qulture share load error:', err);
+        hide('loading-wrap');
+        show('error-wrap');
       });
-
-    }).then(function(data){
-      var profile = data.profiles[0] || null;
-      var owner   = (profile && (profile.display_name || profile.username)) || 'A Qulture user';
-
-      var decided = data.options.filter(function(o){ return o.status === 'decided'; });
-      var display = decided.length > 0 ? decided : data.options;
-
-      renderPlan(data.session, display, owner, data.cityPhoto);
-
-      hide('loading-wrap');
-      show('plan-wrap');
-
-      var barShown = false;
-      function showBar() {
-        if (barShown) return;
-        barShown = true;
-        $('bottom-bar').classList.add('up');
-      }
-      window.addEventListener('scroll', function(){ if (window.scrollY > 80) showBar(); }, { passive:true });
-      setTimeout(showBar, 1200);
-
-    }).catch(function(err){
-      console.error('Qulture share load error:', err);
-      hide('loading-wrap');
-      show('error-wrap');
-    });
   }
 
   load();
