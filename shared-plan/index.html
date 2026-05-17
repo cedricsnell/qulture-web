@@ -367,13 +367,19 @@
       text-align:center;
     }
     .promo-inner { max-width:360px; margin:0 auto; }
-    .promo-gem {
-      width:58px; height:58px;
-      background:linear-gradient(135deg,#c8965a,#e8c090);
+    .promo-logo-wrap {
+      background:#000;
       border-radius:16px;
-      display:flex; align-items:center; justify-content:center;
-      font-size:24px; margin:0 auto 18px;
-      box-shadow:0 4px 16px rgba(200,150,90,.28);
+      padding:10px 20px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      margin:0 auto 18px;
+    }
+    .promo-logo-img {
+      height:48px;
+      width:auto;
+      display:block;
     }
     .promo-name {
       font-family:'Playfair Display',serif;
@@ -475,7 +481,9 @@
 
   <section class="promo">
     <div class="promo-inner">
-      <div class="promo-gem">✦</div>
+      <div class="promo-logo-wrap">
+        <img src="/qulture-logo.png" alt="Qulture" class="promo-logo-img" />
+      </div>
       <div class="promo-name">Qulture</div>
       <div class="promo-tag">Plan trips, dinners, and nights out with AI — together.</div>
       <a href="https://apps.apple.com/app/id6759091761" class="store-badge" target="_blank" rel="noopener">
@@ -556,39 +564,93 @@
     }).then(function(r){ return r.json(); });
   }
 
-  function fetchWikiPhoto(query, location) {
-    if (!query) return Promise.resolve(null);
-    // Build search term: "Title, Location" gives better geo-specific results
-    var term = location
-      ? query.split(',')[0].trim() + ' ' + location.split(',')[0].trim()
-      : query.split(',')[0].trim();
-    // Use the Wikipedia search API (fuzzy) rather than exact-title summary
-    var url = 'https://en.wikipedia.org/w/api.php'
-      + '?action=query&list=search&srsearch=' + encodeURIComponent(term)
-      + '&srlimit=1&srprop=&format=json&origin=*';
-    return fetch(url)
+  // US state abbreviation → full name for Wikipedia title disambiguation
+  var STATE_MAP = {
+    'AL':'Alabama','AK':'Alaska','AZ':'Arizona','AR':'Arkansas','CA':'California',
+    'CO':'Colorado','CT':'Connecticut','DE':'Delaware','FL':'Florida','GA':'Georgia',
+    'HI':'Hawaii','ID':'Idaho','IL':'Illinois','IN':'Indiana','IA':'Iowa',
+    'KS':'Kansas','KY':'Kentucky','LA':'Louisiana','ME':'Maine','MD':'Maryland',
+    'MA':'Massachusetts','MI':'Michigan','MN':'Minnesota','MS':'Mississippi',
+    'MO':'Missouri','MT':'Montana','NE':'Nebraska','NV':'Nevada','NH':'New Hampshire',
+    'NJ':'New Jersey','NM':'New Mexico','NY':'New York','NC':'North Carolina',
+    'ND':'North Dakota','OH':'Ohio','OK':'Oklahoma','OR':'Oregon','PA':'Pennsylvania',
+    'RI':'Rhode Island','SC':'South Carolina','SD':'South Dakota','TN':'Tennessee',
+    'TX':'Texas','UT':'Utah','VT':'Vermont','VA':'Virginia','WA':'Washington',
+    'WV':'West Virginia','WI':'Wisconsin','WY':'Wyoming','DC':'District of Columbia'
+  };
+
+  // Fetch thumbnail from a single Wikipedia REST summary title
+  function restSummaryPhoto(wikiTitle) {
+    return fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(wikiTitle))
       .then(function(r){ return r.ok ? r.json() : null; })
-      .then(function(data){
-        if (!data) return null;
-        var hits = data.query && data.query.search;
-        if (!hits || hits.length === 0) return null;
-        var pageId = hits[0].pageid;
-        // Fetch the thumbnail for the matched page
-        return fetch(
-          'https://en.wikipedia.org/w/api.php'
-          + '?action=query&pageids=' + pageId
-          + '&prop=pageimages&pithumbsize=800&format=json&origin=*'
-        );
-      })
-      .then(function(r){ return r && r.ok ? r.json() : null; })
-      .then(function(data){
-        if (!data) return null;
-        var pages = data.query && data.query.pages;
-        if (!pages) return null;
-        var page = Object.values(pages)[0];
-        return (page && page.thumbnail && page.thumbnail.source) || null;
+      .then(function(d){
+        if (!d || d.type === 'disambiguation') return null;
+        return (d.originalimage && d.originalimage.source) ||
+               (d.thumbnail    && d.thumbnail.source)    || null;
       })
       .catch(function(){ return null; });
+  }
+
+  // Fuzzy Wikipedia search → fetch thumbnail for top result
+  function wikiSearchPhoto(term) {
+    return fetch(
+      'https://en.wikipedia.org/w/api.php?action=query&list=search'
+      + '&srsearch=' + encodeURIComponent(term)
+      + '&srlimit=1&srprop=&format=json&origin=*'
+    )
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){
+      if (!data) return null;
+      var hits = data.query && data.query.search;
+      if (!hits || hits.length === 0) return null;
+      var pageId = hits[0].pageid;
+      return fetch(
+        'https://en.wikipedia.org/w/api.php?action=query&pageids=' + pageId
+        + '&prop=pageimages&pithumbsize=800&format=json&origin=*'
+      );
+    })
+    .then(function(r){ return r && r.ok ? r.json() : null; })
+    .then(function(data){
+      if (!data) return null;
+      var pages = data.query && data.query.pages;
+      if (!pages) return null;
+      var page = Object.values(pages)[0];
+      return (page && page.thumbnail && page.thumbnail.source) || null;
+    })
+    .catch(function(){ return null; });
+  }
+
+  // Main image fetcher.
+  // When location is null  → treat query as a city/destination; use REST
+  //                          summary with state disambiguation first, then search.
+  // When location is given → POI lookup; use fuzzy search directly.
+  function fetchWikiPhoto(query, location) {
+    if (!query) return Promise.resolve(null);
+    var baseQuery   = query.split(',')[0].trim();
+    var locationPart = location ? location.split(',')[0].trim() : null;
+
+    if (!locationPart) {
+      // City/destination path
+      var parts       = query.split(',');
+      var stateAbbr   = parts.length > 1 ? parts[1].trim() : null;
+      var stateFull   = stateAbbr && STATE_MAP[stateAbbr] ? STATE_MAP[stateAbbr] : stateAbbr;
+      // Try "City,_State" then plain "City" via REST summary (exact article match)
+      var title1 = stateFull
+        ? (baseQuery + ', ' + stateFull).replace(/ /g, '_')
+        : null;
+      var title2 = baseQuery.replace(/ /g, '_');
+      var p = title1 ? restSummaryPhoto(title1) : Promise.resolve(null);
+      return p.then(function(photo){
+        return photo || restSummaryPhoto(title2);
+      }).then(function(photo){
+        if (photo) return photo;
+        // Final fallback: fuzzy search
+        return wikiSearchPhoto(stateFull ? baseQuery + ' ' + stateFull : baseQuery);
+      });
+    }
+
+    // POI path — fuzzy search with place name + city
+    return wikiSearchPhoto(baseQuery + ' ' + locationPart);
   }
 
   window.openApp = function() {
