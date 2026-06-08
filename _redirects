@@ -1,0 +1,4 @@
+# Proxy personalized list share links to the backend.
+# URL format: qulture.app/s/{username}/{token}
+# The backend's /s/:username/:token route resolves by token; username is decorative.
+/s/*  https://qulture-backend-api.onrender.com/s/:splat  200
