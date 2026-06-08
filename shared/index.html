@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qulture — Shared List</title>
+  <meta name="description" content="A curated list shared with you on Qulture." />
+
+  <!-- Open Graph for rich link previews in iMessage / Slack / etc. -->
+  <meta property="og:title" content="Shared list on Qulture" />
+  <meta property="og:description" content="Someone shared a curated list with you." />
+  <meta property="og:site_name" content="Qulture" />
+  <meta property="og:type" content="website" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --bg-card: #13131a;
+      --bg-item: #18181f;
+      --primary: #7c3aed;
+      --primary-light: #a78bfa;
+      --pink: #ec4899;
+      --green: #10b981;
+      --text: #f8f8ff;
+      --text-secondary: #a0a0b8;
+      --text-tertiary: #606070;
+      --border: rgba(255,255,255,0.07);
+      --border-hover: rgba(167,139,250,0.3);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary-light), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--pink));
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      transition: opacity 0.2s, transform 0.15s;
+      white-space: nowrap;
+    }
+    .nav-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ── Content wrapper ── */
+    .page {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 16px 80px;
+    }
+
+    /* ── Loading / Error states ── */
+    .state-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      text-align: center;
+      gap: 12px;
+      padding: 40px 24px;
+    }
+
+    .state-icon { font-size: 52px; margin-bottom: 8px; }
+
+    .state-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .state-subtitle {
+      font-size: 15px;
+      color: var(--text-secondary);
+      max-width: 320px;
+      line-height: 1.6;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary-light);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── List header ── */
+    .list-header {
+      text-align: center;
+      padding: 40px 0 28px;
+    }
+
+    .list-type-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: rgba(124,58,237,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 20px;
+    }
+
+    .list-name {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .list-meta {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+    }
+
+    /* ── CTA buttons ── */
+    .btn-row {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .btn-primary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--pink));
+      color: #fff;
+      text-decoration: none;
+      padding: 16px 24px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 8px 24px rgba(124,58,237,0.3);
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+
+    .btn-secondary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      text-decoration: none;
+      padding: 14px 24px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-secondary:hover {
+      border-color: var(--border-hover);
+      background: rgba(124,58,237,0.08);
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Item cards ── */
+    .items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .item-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .item-card:last-child { border-bottom: none; }
+
+    .item-thumb {
+      width: 72px;
+      height: 72px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg-card);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    .item-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .item-content { flex: 1; min-width: 0; }
+
+    .item-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .item-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .item-price {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .item-badge {
+      display: inline-block;
+      font-size: 12px;
+      color: var(--text-secondary);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2px 8px;
+      margin-bottom: 6px;
+    }
+
+    .item-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .item-location {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      text-decoration: none;
+      margin-bottom: 4px;
+      transition: color 0.2s;
+    }
+    .item-location:hover { color: var(--primary-light); }
+
+    .item-location-text {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .item-location-link {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary-light);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .item-source {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--primary-light);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .item-source:hover { opacity: 0.8; }
+
+    /* ── Acquisition footer card ── */
+    .acq-card {
+      margin-top: 48px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .acq-logo {
+      font-size: 18px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary-light), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .acq-tagline {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .acq-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--pink));
+      color: #fff;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 6px 20px rgba(124,58,237,0.3);
+    }
+    .acq-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    .acq-sub {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    /* ── Utilities ── */
+    .hidden { display: none !important; }
+
+    @media (max-width: 400px) {
+      .btn-primary, .btn-secondary { font-size: 14px; padding: 14px 16px; }
+      .list-name { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <a class="nav-logo" href="https://qulture.app">Qulture</a>
+    <a class="nav-btn" href="https://apps.apple.com/app/qulture/id6741731006">
+      ↓ Get the App
+    </a>
+  </nav>
+
+  <!-- Loading state (default) -->
+  <div class="page" id="state-loading">
+    <div class="state-center">
+      <div class="spinner"></div>
+      <p class="state-subtitle">Loading list…</p>
+    </div>
+  </div>
+
+  <!-- Error: not found -->
+  <div class="page hidden" id="state-not-found">
+    <div class="state-center">
+      <div class="state-icon">🔗</div>
+      <p class="state-title">Link not found</p>
+      <p class="state-subtitle">This share link is invalid or has been removed.</p>
+    </div>
+  </div>
+
+  <!-- Error: expired -->
+  <div class="page hidden" id="state-expired">
+    <div class="state-center">
+      <div class="state-icon">⏰</div>
+      <p class="state-title">Link expired</p>
+      <p class="state-subtitle" id="expired-msg">This share link has expired.</p>
+    </div>
+  </div>
+
+  <!-- Loaded list -->
+  <div class="page hidden" id="state-list">
+    <!-- List header -->
+    <div class="list-header">
+      <div class="list-type-icon" id="list-type-icon">📋</div>
+      <h1 class="list-name" id="list-name">—</h1>
+      <p class="list-meta" id="list-meta">—</p>
+
+      <div class="btn-row">
+        <a class="btn-primary" id="open-in-app" href="#">
+          📱 Open in Qulture
+        </a>
+        <a class="btn-secondary" href="https://apps.apple.com/app/qulture/id6741731006">
+          ↓ Download Qulture — Free on the App Store
+        </a>
+      </div>
+    </div>
+
+    <!-- Items -->
+    <p class="section-label" id="items-label">Items</p>
+    <div class="items-list" id="items-list"></div>
+
+    <!-- Acquisition CTA -->
+    <div class="acq-card">
+      <div class="acq-logo">Qulture</div>
+      <p class="acq-tagline">
+        Save and share the places, films, music, and books you love. AI does the organizing.
+      </p>
+      <a class="acq-btn" href="https://apps.apple.com/app/qulture/id6741731006">
+        Get Qulture — Free on iOS
+      </a>
+      <p class="acq-sub">Made with ♥ by Proprius Labs</p>
+    </div>
+  </div>
+
+  <script>
+    const APP_STORE = 'https://apps.apple.com/app/qulture/id6741731006';
+
+    const TYPE_ICONS = {
+      movies: '🎬', tvshows: '📺', music: '🎵', books: '📚',
+      restaurants: '🍽', place: '📍', other: '📋',
+    };
+
+    const ITEM_EMOJI = {
+      restaurant: '🍽', place: '📍', movie: '🎬', tvshow: '📺',
+      song: '🎵', album: '🎵', book: '📚', recipe: '🍳',
+      product: '🛍', other: '✨',
+    };
+
+    function showState(id) {
+      ['state-loading','state-not-found','state-expired','state-list'].forEach(s => {
+        document.getElementById(s).classList.toggle('hidden', s !== id);
+      });
+    }
+
+    function getToken() {
+      // Path is /shared/{token} — rewrote to this page via _redirects
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      return parts[parts.length - 1] || null;
+    }
+
+    function buildPlaceholder(title, emoji) {
+      const div = document.createElement('div');
+      div.className = 'item-thumb';
+      div.textContent = emoji || '✨';
+      return div;
+    }
+
+    function buildItemCard(item) {
+      const emoji = ITEM_EMOJI[item.itemType] || '✨';
+      const card = document.createElement('div');
+      card.className = 'item-card';
+
+      // Thumbnail
+      if (item.imageUrl) {
+        const thumb = document.createElement('div');
+        thumb.className = 'item-thumb';
+        const img = document.createElement('img');
+        img.src = item.imageUrl;
+        img.alt = item.title;
+        img.onerror = () => { thumb.textContent = emoji; };
+        thumb.appendChild(img);
+        card.appendChild(thumb);
+      } else {
+        card.appendChild(buildPlaceholder(item.title, emoji));
+      }
+
+      // Content
+      const content = document.createElement('div');
+      content.className = 'item-content';
+
+      // Title row
+      const titleRow = document.createElement('div');
+      titleRow.className = 'item-title-row';
+      const title = document.createElement('span');
+      title.className = 'item-title';
+      title.textContent = item.title;
+      titleRow.appendChild(title);
+      if (item.priceRange) {
+        const price = document.createElement('span');
+        price.className = 'item-price';
+        price.textContent = item.priceRange;
+        titleRow.appendChild(price);
+      }
+      content.appendChild(titleRow);
+
+      // Cuisine badge
+      if (item.cuisine) {
+        const badge = document.createElement('div');
+        badge.className = 'item-badge';
+        badge.textContent = `${emoji} ${item.cuisine}`;
+        content.appendChild(badge);
+      } else if (item.description && !item.location) {
+        const desc = document.createElement('p');
+        desc.className = 'item-desc';
+        desc.textContent = item.description;
+        content.appendChild(desc);
+      }
+
+      // Location row
+      if (item.location) {
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location)}`;
+        const locRow = document.createElement('a');
+        locRow.className = 'item-location';
+        locRow.href = mapsUrl;
+        locRow.target = '_blank';
+        locRow.rel = 'noopener noreferrer';
+        locRow.innerHTML = `<span>📍</span><span class="item-location-text">${item.location}</span><span class="item-location-link">Directions →</span>`;
+        content.appendChild(locRow);
+      }
+
+      // Source link
+      if (item.sourceUrl) {
+        const src = document.createElement('a');
+        src.className = 'item-source';
+        src.href = item.sourceUrl;
+        src.target = '_blank';
+        src.rel = 'noopener noreferrer';
+        src.innerHTML = '<span>🔗</span><span>View Source</span>';
+        content.appendChild(src);
+      }
+
+      card.appendChild(content);
+      return card;
+    }
+
+    async function load() {
+      const token = getToken();
+      if (!token || token === 'index.html') {
+        showState('state-not-found');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/.netlify/functions/get-shared-list?token=${encodeURIComponent(token)}`);
+
+        if (res.status === 404) { showState('state-not-found'); return; }
+        if (!res.ok) { showState('state-not-found'); return; }
+
+        const data = await res.json();
+
+        if (data.error === 'not_found' || data.error === 'list_not_found') {
+          showState('state-not-found');
+          return;
+        }
+
+        if (data.isExpired) {
+          document.getElementById('expired-msg').textContent =
+            `This share link has expired. Ask ${data.ownerName} to send a new one.`;
+          showState('state-expired');
+          return;
+        }
+
+        // Render the list
+        const typeIcon = TYPE_ICONS[data.listType] || '📋';
+        document.getElementById('list-type-icon').textContent = typeIcon;
+        document.getElementById('list-name').textContent = data.listName;
+
+        const itemCount = data.items.length;
+        document.getElementById('list-meta').textContent =
+          `Shared by ${data.ownerName} · ${itemCount} ${itemCount === 1 ? 'item' : 'items'}`;
+
+        // Open-in-app deep link
+        document.getElementById('open-in-app').href = `qulture://shared-list/${token}`;
+
+        // Update page title + OG
+        document.title = `${data.listName} — Qulture`;
+
+        // Items
+        const label = document.getElementById('items-label');
+        const list = document.getElementById('items-list');
+
+        if (itemCount === 0) {
+          label.textContent = 'No items yet';
+        } else {
+          label.textContent = `${itemCount} ${itemCount === 1 ? 'Item' : 'Items'}`;
+          data.items.forEach(item => list.appendChild(buildItemCard(item)));
+        }
+
+        showState('state-list');
+
+        // Attempt to deep-link into the app immediately on mobile
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          setTimeout(() => {
+            window.location.href = `qulture://shared-list/${token}`;
+          }, 1200); // small delay so user sees the list content first
+        }
+
+      } catch {
+        showState('state-not-found');
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>

@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-itunes-app" content="app-id=6759091761" />
+
+  <meta id="og-title"  property="og:title"       content="A Qulture Plan" />
+  <meta id="og-desc"   property="og:description"  content="View this collaborative plan on Qulture." />
+  <meta id="og-image"  property="og:image"        content="https://qulture.app/og-default.png" />
+  <meta               property="og:type"          content="website" />
+  <meta               property="og:site_name"     content="Qulture" />
+  <meta               name="twitter:card"         content="summary_large_image" />
+
+  <title>Qulture — View Plan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #faf9f7;
+      --surf:      #ffffff;
+      --surf2:     #f4f2ef;
+      --border:    rgba(26,23,20,0.08);
+      --border2:   rgba(26,23,20,0.14);
+      --text:      #1a1714;
+      --text2:     #6b6560;
+      --text3:     #a09890;
+      --accent:    #c8965a;
+      --accent-dk: #a67240;
+      --accent-bg: rgba(200,150,90,0.1);
+      --green:     #2a7a52;
+      --amber:     #b8892e;
+      --nav-h:     60px;
+      --max-w:     720px;
+      --r:         12px;
+    }
+
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      -webkit-font-smoothing:antialiased;
+      overflow-x:hidden;
+    }
+
+    /* NAV */
+    .nav {
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      height:var(--nav-h);
+      display:flex; align-items:center;
+      padding:0 24px;
+      background:rgba(250,249,247,0.92);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--border);
+    }
+    .nav-inner {
+      max-width:var(--max-w); width:100%; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .nav-logo {
+      display:flex; align-items:center; gap:10px;
+      text-decoration:none; color:var(--text);
+      font-family:'Playfair Display',serif;
+      font-weight:700; font-size:18px; letter-spacing:-0.3px;
+    }
+    .nav-logo-img {
+      height:34px; width:auto;
+      display:block;
+    }
+    .nav-cta {
+      display:inline-flex; align-items:center; gap:5px;
+      background:var(--text); color:var(--bg);
+      font-size:12.5px; font-weight:600; letter-spacing:0.1px;
+      padding:7px 16px; border-radius:20px;
+      text-decoration:none;
+      transition:opacity .15s,transform .15s;
+    }
+    .nav-cta:hover { opacity:.82; transform:translateY(-1px); }
+
+    /* HERO */
+    .hero {
+      position:relative;
+      min-height:520px;
+      display:flex; align-items:flex-end;
+      overflow:hidden;
+    }
+    .hero-bg-ph {
+      position:absolute; inset:0;
+      background:linear-gradient(160deg,#c8b49a,#a08060 50%,#786048);
+    }
+    .hero-bg-photo {
+      position:absolute; inset:0;
+      background-size:cover; background-position:center;
+      opacity:0; transition:opacity 1s ease;
+    }
+    .hero-bg-photo.visible { opacity:1; }
+    .hero-overlay {
+      position:absolute; inset:0;
+      background:linear-gradient(to bottom,
+        rgba(10,7,4,.12) 0%,
+        rgba(10,7,4,.30) 35%,
+        rgba(10,7,4,.70) 68%,
+        rgba(10,7,4,.90) 100%);
+    }
+    .hero-content {
+      position:relative; z-index:1;
+      width:100%; max-width:var(--max-w);
+      margin:0 auto;
+      padding:calc(var(--nav-h) + 64px) 24px 48px;
+    }
+    .hero-pill {
+      display:inline-block;
+      background:rgba(255,255,255,.15);
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
+      border:1px solid rgba(255,255,255,.22);
+      border-radius:20px;
+      padding:4px 14px;
+      font-size:10.5px; font-weight:600;
+      letter-spacing:1.2px; text-transform:uppercase;
+      color:rgba(255,255,255,.88);
+      margin-bottom:18px;
+    }
+    .hero h1 {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(30px,8vw,54px);
+      font-weight:800; line-height:1.05; letter-spacing:-0.5px;
+      color:#fff;
+      margin-bottom:16px;
+    }
+    .hero-byline {
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+      font-size:13.5px; color:rgba(255,255,255,.68);
+      margin-bottom:10px;
+    }
+    .hero-byline strong { color:rgba(255,255,255,.9); font-weight:600; }
+    .hero-byline .dot   { color:rgba(255,255,255,.28); }
+    .hero-dest {
+      display:none;
+      align-items:center; gap:5px;
+      font-size:13px; color:rgba(255,255,255,.62);
+      margin-bottom:28px;
+    }
+    .hero-open-btn {
+      display:inline-flex; align-items:center; gap:9px;
+      background:#fff; color:var(--text);
+      border:none; border-radius:12px;
+      padding:13px 26px;
+      font-family:'Inter',sans-serif;
+      font-size:15px; font-weight:700;
+      cursor:pointer; text-decoration:none;
+      box-shadow:0 4px 20px rgba(0,0,0,.22);
+      transition:transform .15s,opacity .15s;
+    }
+    .hero-open-btn:hover { transform:translateY(-2px); opacity:.96; }
+    .hero-open-btn .arr { color:var(--accent); }
+
+    /* PLAN BODY */
+    .plan-body { padding:0 24px 160px; }
+    .plan-inner {
+      max-width:var(--max-w); margin:0 auto;
+      padding-top:48px;
+    }
+
+    .eyebrow-row {
+      display:flex; align-items:center; gap:16px;
+      margin-bottom:32px;
+    }
+    .eyebrow-line { flex:1; height:1px; background:var(--border2); }
+    .eyebrow-lbl {
+      font-size:10px; font-weight:700;
+      letter-spacing:2.2px; text-transform:uppercase;
+      color:var(--accent); white-space:nowrap;
+    }
+
+    /* Day groups */
+    .day-group { margin-bottom:4px; }
+    .day-hdr {
+      display:flex; align-items:center; gap:14px;
+      margin:40px 0 16px;
+    }
+    .day-hdr:first-child { margin-top:0; }
+    .day-lbl {
+      font-family:'Playfair Display',serif;
+      font-style:italic; font-size:16px; font-weight:700;
+      color:var(--text); white-space:nowrap;
+    }
+    .day-line { flex:1; height:1px; background:var(--border); }
+
+    /* Category groups */
+    .cat-group { margin-bottom:4px; }
+    .cat-hdr {
+      display:flex; align-items:center; gap:10px;
+      margin:36px 0 14px;
+    }
+    .cat-hdr:first-child { margin-top:0; }
+    .cat-emoji { font-size:18px; line-height:1; }
+    .cat-ttl   { font-size:14px; font-weight:700; color:var(--text2); letter-spacing:-.1px; }
+    .cat-cnt   { font-size:12px; color:var(--text3); }
+
+    /* PLACE CARD */
+    .place-card {
+      background:var(--surf);
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      overflow:hidden;
+      margin-bottom:14px;
+      box-shadow:0 1px 4px rgba(0,0,0,.05);
+      transition:transform .18s,box-shadow .18s;
+    }
+    .place-card:hover {
+      transform:translateY(-3px);
+      box-shadow:0 10px 30px rgba(0,0,0,.1);
+    }
+
+    /* Top image / placeholder */
+    .place-top {
+      position:relative;
+      padding-top:56.25%;
+      overflow:hidden;
+    }
+    .place-ph {
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .ph-emoji { font-size:52px; opacity:.65; }
+    .place-img {
+      position:absolute; inset:0;
+      width:100%; height:100%; object-fit:cover;
+      transition:transform .4s;
+    }
+    .place-card:hover .place-img { transform:scale(1.04); }
+
+    /* Category placeholder gradients */
+    .ph-hotel       { background:linear-gradient(135deg,#c8b49a,#d8c8b4); }
+    .ph-restaurant  { background:linear-gradient(135deg,#d4907a,#e8b09a); }
+    .ph-activity    { background:linear-gradient(135deg,#8aaa8e,#b0c8b4); }
+    .ph-transport   { background:linear-gradient(135deg,#8a9fb0,#b0c0d0); }
+    .ph-item        { background:linear-gradient(135deg,#aa8aaa,#c8b0c8); }
+    .ph-general     { background:linear-gradient(135deg,#c8a47a,#ddc090); }
+
+    /* Overlay on card top */
+    .top-overlay {
+      position:absolute; bottom:0; left:0; right:0;
+      padding:10px 12px;
+      display:flex; align-items:flex-end; justify-content:space-between;
+      background:linear-gradient(to top,rgba(10,7,4,.58) 0%,transparent 68%);
+    }
+    .cat-tag {
+      font-size:10.5px; font-weight:600;
+      letter-spacing:.5px; text-transform:uppercase;
+      color:rgba(255,255,255,.9);
+      background:rgba(0,0,0,.28);
+      backdrop-filter:blur(4px);
+      border-radius:5px; padding:3px 8px;
+    }
+    .status-tag {
+      display:inline-flex; align-items:center; gap:5px;
+      font-size:10.5px; font-weight:600;
+      border-radius:5px; padding:3px 9px;
+      text-transform:uppercase; letter-spacing:.5px;
+    }
+    .status-tag.decided     { background:rgba(42,122,82,.88);  color:#fff; }
+    .status-tag.considering { background:rgba(184,137,46,.88); color:#fff; }
+    .status-dot { width:5px; height:5px; border-radius:50%; background:currentColor; flex-shrink:0; }
+
+    /* Card body */
+    .place-body { padding:18px 20px 16px; }
+    .place-name {
+      font-family:'Playfair Display',serif;
+      font-size:17px; font-weight:700; line-height:1.25;
+      color:var(--text); margin-bottom:8px;
+      display:block; text-decoration:none;
+    }
+    a.place-name:hover { color:var(--accent-dk); }
+    .place-loc-row {
+      display:flex; align-items:flex-start; gap:5px;
+      margin-bottom:8px;
+    }
+    .loc-pin  { font-size:13px; flex-shrink:0; line-height:1.45; }
+    .place-loc {
+      font-size:12.5px; color:var(--text2);
+      text-decoration:none; line-height:1.45;
+    }
+    .place-loc:hover { color:var(--accent); text-decoration:underline; }
+    .price-pill {
+      display:inline-block;
+      font-size:11px; font-weight:600;
+      padding:2px 8px; border-radius:5px;
+      background:var(--accent-bg);
+      color:var(--accent-dk);
+      border:1px solid rgba(200,150,90,.2);
+      margin-bottom:10px;
+    }
+    .place-desc {
+      font-size:13px; color:var(--text2);
+      line-height:1.6;
+      display:-webkit-box;
+      -webkit-line-clamp:3; -webkit-box-orient:vertical;
+      overflow:hidden;
+      margin-bottom:12px;
+    }
+    .visit-link {
+      display:inline-flex; align-items:center; gap:3px;
+      font-size:12.5px; font-weight:600;
+      color:var(--accent); text-decoration:none;
+    }
+    .visit-link:hover { color:var(--accent-dk); text-decoration:underline; }
+
+    /* EMPTY */
+    .empty-state { text-align:center; padding:64px 20px; }
+    .empty-icon  { font-size:48px; margin-bottom:16px; }
+    .empty-title { font-size:18px; font-weight:700; color:var(--text2); margin-bottom:10px; }
+    .empty-sub   { font-size:14px; color:var(--text3); line-height:1.6; max-width:280px; margin:0 auto 28px; }
+
+    /* LOADING */
+    .loading-wrap {
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      flex-direction:column; gap:16px;
+    }
+    .spinner {
+      width:32px; height:32px;
+      border:2.5px solid rgba(200,150,90,.2);
+      border-top-color:var(--accent);
+      border-radius:50%;
+      animation:spin .75s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-txt { font-size:13.5px; color:var(--text3); }
+
+    /* ERROR */
+    .error-wrap {
+      min-height:100vh;
+      padding:calc(var(--nav-h) + 60px) 24px 60px;
+      display:flex; align-items:center; justify-content:center;
+      flex-direction:column; gap:14px; text-align:center;
+    }
+    .error-icon  { font-size:42px; }
+    .error-title {
+      font-family:'Playfair Display',serif;
+      font-size:24px; font-weight:800; letter-spacing:-.3px;
+    }
+    .error-sub { font-size:14px; color:var(--text2); max-width:300px; line-height:1.6; }
+    .error-btn {
+      display:inline-flex; align-items:center; gap:8px;
+      background:var(--text); color:var(--bg);
+      border:none; border-radius:12px;
+      padding:13px 26px; margin-top:8px;
+      font-family:'Inter',sans-serif;
+      font-size:15px; font-weight:700;
+      cursor:pointer; text-decoration:none;
+      transition:opacity .15s;
+    }
+    .error-btn:hover { opacity:.82; }
+
+    /* PROMO FOOTER */
+    .promo {
+      background:var(--surf);
+      border-top:1px solid var(--border);
+      padding:52px 24px;
+      text-align:center;
+    }
+    .promo-inner { max-width:360px; margin:0 auto; }
+    .promo-logo-wrap {
+      background:#000;
+      border-radius:16px;
+      padding:10px 20px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      margin:0 auto 18px;
+    }
+    .promo-logo-img {
+      height:48px;
+      width:auto;
+      display:block;
+    }
+    .promo-name {
+      font-family:'Playfair Display',serif;
+      font-size:24px; font-weight:800; color:var(--text);
+      margin-bottom:10px;
+    }
+    .promo-tag { font-size:14px; color:var(--text2); line-height:1.6; margin-bottom:28px; }
+    .store-badge img { height:44px; }
+    .promo-credit { margin-top:24px; font-size:11.5px; color:var(--text3); }
+
+    /* BOTTOM BAR */
+    .bottom-bar {
+      position:fixed; bottom:0; left:0; right:0; z-index:50;
+      background:rgba(250,249,247,.94);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      border-top:1px solid var(--border);
+      padding:12px 16px;
+      padding-bottom:max(12px,env(safe-area-inset-bottom));
+      display:flex; gap:10px; align-items:center;
+      transform:translateY(100%);
+      transition:transform .35s cubic-bezier(.4,0,.2,1);
+    }
+    .bottom-bar.up { transform:translateY(0); }
+    .bb-open {
+      flex:1; background:var(--text); color:var(--bg);
+      border:none; border-radius:12px;
+      padding:13px 20px;
+      font-family:'Inter',sans-serif;
+      font-size:15px; font-weight:700;
+      cursor:pointer; text-align:center;
+      transition:opacity .15s;
+    }
+    .bb-open:hover { opacity:.84; }
+    .bb-dl {
+      font-size:12px; font-weight:600;
+      color:var(--text2); text-decoration:none;
+      white-space:nowrap; padding:8px 4px;
+    }
+    .bb-dl:hover { color:var(--text); }
+
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="https://qulture.app" class="nav-logo">
+      <img src="/qulture-logo.png" alt="Qulture" class="nav-logo-img" />
+      Qulture
+    </a>
+    <a href="https://apps.apple.com/app/id6759091761" class="nav-cta" target="_blank" rel="noopener">
+      ↓ Get the App
+    </a>
+  </div>
+</nav>
+
+<div id="loading-wrap" class="loading-wrap">
+  <div class="spinner"></div>
+  <div class="loading-txt">Loading plan…</div>
+</div>
+
+<div id="error-wrap" class="error-wrap hidden">
+  <div class="error-icon">🗺️</div>
+  <div class="error-title">Plan not found</div>
+  <div class="error-sub">This link may have expired or been revoked. Ask the planner to share it again.</div>
+  <a href="https://apps.apple.com/app/id6759091761" class="error-btn" target="_blank" rel="noopener">
+    Get Qulture Free →
+  </a>
+</div>
+
+<div id="plan-wrap" class="hidden">
+
+  <section class="hero" id="hero">
+    <div class="hero-bg-ph"></div>
+    <div class="hero-bg-photo" id="hero-photo"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-pill" id="hero-pill">Plan</div>
+      <h1 id="plan-title">—</h1>
+      <div class="hero-byline" id="hero-meta"></div>
+      <div class="hero-dest" id="hero-dest"></div>
+      <button class="hero-open-btn" onclick="openApp()">
+        Open in Qulture <span class="arr">→</span>
+      </button>
+    </div>
+  </section>
+
+  <div class="plan-body">
+    <div class="plan-inner" id="places-container">
+      <div class="eyebrow-row">
+        <div class="eyebrow-line"></div>
+        <span class="eyebrow-lbl">The Itinerary</span>
+        <div class="eyebrow-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="promo">
+    <div class="promo-inner">
+      <div class="promo-logo-wrap">
+        <img src="/qulture-logo.png" alt="Qulture" class="promo-logo-img" />
+      </div>
+      <div class="promo-name">Qulture</div>
+      <div class="promo-tag">Plan trips, dinners, and nights out with AI — together.</div>
+      <a href="https://apps.apple.com/app/id6759091761" class="store-badge" target="_blank" rel="noopener">
+        <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83"
+             alt="Download on the App Store" loading="lazy" />
+      </a>
+      <div class="promo-credit">Made with ♥ by Proprius Labs</div>
+    </div>
+  </section>
+</div>
+
+<div class="bottom-bar" id="bottom-bar">
+  <button class="bb-open" onclick="openApp()">Open in Qulture</button>
+  <a href="https://apps.apple.com/app/id6759091761" class="bb-dl" target="_blank" rel="noopener">↓ Free</a>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+
+  var CATS = {
+    hotel:      { e:'🏨', label:'Stay'        },
+    restaurant: { e:'🍽️', label:'Dining'     },
+    activity:   { e:'🎯', label:'Activities'  },
+    transport:  { e:'✈️', label:'Transport'   },
+    item:       { e:'🛍️', label:'Shopping'   },
+    general:    { e:'✦',  label:'Highlight'   },
+  };
+
+  var TYPE_LABEL = {
+    travel:   'Trip',
+    dining:   'Dining',
+    activity: 'Activity',
+    shopping: 'Shopping',
+    event:    'Event',
+    general:  'Plan',
+  };
+
+  var token = null;
+
+  function $(id)   { return document.getElementById(id); }
+  function show(id){ $(id).classList.remove('hidden'); }
+  function hide(id){ $(id).classList.add('hidden'); }
+
+  function esc(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escAttr(s) { return esc(s).replace(/'/g,'&#39;'); }
+
+  function safeUrl(s) {
+    if (!s) return null;
+    try {
+      var u = new URL(s);
+      return (u.protocol === 'https:' || u.protocol === 'http:') ? s : null;
+    } catch(_) { return null; }
+  }
+
+  function mapsUrl(loc) {
+    if (!loc) return null;
+    return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(loc);
+  }
+
+// US state abbreviation → full name for Wikipedia title disambiguation
+  var STATE_MAP = {
+    'AL':'Alabama','AK':'Alaska','AZ':'Arizona','AR':'Arkansas','CA':'California',
+    'CO':'Colorado','CT':'Connecticut','DE':'Delaware','FL':'Florida','GA':'Georgia',
+    'HI':'Hawaii','ID':'Idaho','IL':'Illinois','IN':'Indiana','IA':'Iowa',
+    'KS':'Kansas','KY':'Kentucky','LA':'Louisiana','ME':'Maine','MD':'Maryland',
+    'MA':'Massachusetts','MI':'Michigan','MN':'Minnesota','MS':'Mississippi',
+    'MO':'Missouri','MT':'Montana','NE':'Nebraska','NV':'Nevada','NH':'New Hampshire',
+    'NJ':'New Jersey','NM':'New Mexico','NY':'New York','NC':'North Carolina',
+    'ND':'North Dakota','OH':'Ohio','OK':'Oklahoma','OR':'Oregon','PA':'Pennsylvania',
+    'RI':'Rhode Island','SC':'South Carolina','SD':'South Dakota','TN':'Tennessee',
+    'TX':'Texas','UT':'Utah','VT':'Vermont','VA':'Virginia','WA':'Washington',
+    'WV':'West Virginia','WI':'Wisconsin','WY':'Wyoming','DC':'District of Columbia'
+  };
+
+  // Fetch thumbnail from a single Wikipedia REST summary title
+  function restSummaryPhoto(wikiTitle) {
+    return fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(wikiTitle))
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        if (!d || d.type === 'disambiguation') return null;
+        return (d.originalimage && d.originalimage.source) ||
+               (d.thumbnail    && d.thumbnail.source)    || null;
+      })
+      .catch(function(){ return null; });
+  }
+
+  // Fuzzy Wikipedia search → fetch thumbnail for top result
+  function wikiSearchPhoto(term) {
+    return fetch(
+      'https://en.wikipedia.org/w/api.php?action=query&list=search'
+      + '&srsearch=' + encodeURIComponent(term)
+      + '&srlimit=1&srprop=&format=json&origin=*'
+    )
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){
+      if (!data) return null;
+      var hits = data.query && data.query.search;
+      if (!hits || hits.length === 0) return null;
+      var pageId = hits[0].pageid;
+      return fetch(
+        'https://en.wikipedia.org/w/api.php?action=query&pageids=' + pageId
+        + '&prop=pageimages&pithumbsize=800&format=json&origin=*'
+      );
+    })
+    .then(function(r){ return r && r.ok ? r.json() : null; })
+    .then(function(data){
+      if (!data) return null;
+      var pages = data.query && data.query.pages;
+      if (!pages) return null;
+      var page = Object.values(pages)[0];
+      return (page && page.thumbnail && page.thumbnail.source) || null;
+    })
+    .catch(function(){ return null; });
+  }
+
+  // Main image fetcher.
+  // When location is null  → treat query as a city/destination; use REST
+  //                          summary with state disambiguation first, then search.
+  // When location is given → POI lookup; use fuzzy search directly.
+  function fetchWikiPhoto(query, location) {
+    if (!query) return Promise.resolve(null);
+    var baseQuery   = query.split(',')[0].trim();
+    var locationPart = location ? location.split(',')[0].trim() : null;
+
+    if (!locationPart) {
+      // City/destination path
+      var parts       = query.split(',');
+      var stateAbbr   = parts.length > 1 ? parts[1].trim() : null;
+      var stateFull   = stateAbbr && STATE_MAP[stateAbbr] ? STATE_MAP[stateAbbr] : stateAbbr;
+      // Try "City,_State" then plain "City" via REST summary (exact article match)
+      var title1 = stateFull
+        ? (baseQuery + ', ' + stateFull).replace(/ /g, '_')
+        : null;
+      var title2 = baseQuery.replace(/ /g, '_');
+      var p = title1 ? restSummaryPhoto(title1) : Promise.resolve(null);
+      return p.then(function(photo){
+        return photo || restSummaryPhoto(title2);
+      }).then(function(photo){
+        if (photo) return photo;
+        // Final fallback: fuzzy search
+        return wikiSearchPhoto(stateFull ? baseQuery + ' ' + stateFull : baseQuery);
+      });
+    }
+
+    // POI path — fuzzy search with place name + city
+    return wikiSearchPhoto(baseQuery + ' ' + locationPart);
+  }
+
+  window.openApp = function() {
+    if (!token) return;
+    window.location.href = 'qulture://shared-plan/' + token;
+  };
+
+  function renderHero(session, options, ownerName, cityPhotoUrl) {
+    var ctx  = session.context || {};
+    var type = TYPE_LABEL[session.session_type] || 'Plan';
+
+    $('hero-pill').textContent    = ctx.occasion || type;
+    $('plan-title').textContent   = session.title || 'Untitled Plan';
+    document.title                = (session.title || 'Untitled Plan') + ' — Qulture';
+    $('og-title').content         = (session.title || 'A Qulture Plan') + ' — Qulture';
+    $('og-desc').content          = 'A plan with ' + options.length + ' places, shared on Qulture.';
+
+    var cnt = options.length;
+    var byline =
+      '<span>Curated by <strong>' + esc(ownerName) + '</strong></span>' +
+      '<span class="dot">·</span>' +
+      '<span>' + cnt + ' ' + (cnt === 1 ? 'place' : 'places') + '</span>';
+    if (ctx.dates) byline += '<span class="dot">·</span><span>' + esc(ctx.dates) + '</span>';
+    $('hero-meta').innerHTML = byline;
+
+    if (ctx.destination) {
+      var dest = $('hero-dest');
+      dest.innerHTML    = '📍 ' + esc(ctx.destination);
+      dest.style.display = 'inline-flex';
+    }
+
+    function setBg(url) {
+      var el = $('hero-photo');
+      el.style.backgroundImage = 'url(' + encodeURI(url) + ')';
+      el.classList.add('visible');
+      $('og-image').content = url;
+    }
+
+    if (cityPhotoUrl) {
+      setBg(cityPhotoUrl);
+    } else {
+      var first = options.find(function(o){ return o.image_url; });
+      if (first) {
+        var img = new Image();
+        img.onload = function(){ setBg(first.image_url); };
+        img.src = first.image_url;
+      }
+    }
+  }
+
+  function makeCard(opt) {
+    var cat       = CATS[opt.category] || CATS.general;
+    var url       = safeUrl(opt.url);
+    var locLink   = mapsUrl(opt.location);
+    var phClass   = 'ph-' + (opt.category || 'general');
+    var statusCls = opt.status === 'decided' ? 'decided' : 'considering';
+    var statusLbl = opt.status === 'decided' ? 'Chosen' : 'Considering';
+
+    var topHtml =
+      '<div class="place-top">' +
+        '<div class="place-ph ' + phClass + '">' +
+          '<span class="ph-emoji">' + cat.e + '</span>' +
+        '</div>' +
+        (opt.image_url
+          ? '<img class="place-img"' +
+              ' src="' + escAttr(opt.image_url) + '"' +
+              ' alt="' + escAttr(opt.title) + '"' +
+              ' loading="lazy"' +
+              ' onerror="this.style.display=\'none\'" />'
+          : '') +
+        '<div class="top-overlay">' +
+          '<span class="cat-tag">' + esc(cat.label) + '</span>' +
+          '<span class="status-tag ' + statusCls + '">' +
+            '<span class="status-dot"></span>' + statusLbl +
+          '</span>' +
+        '</div>' +
+      '</div>';
+
+    var nameHtml = url
+      ? '<a class="place-name" href="' + escAttr(url) + '" target="_blank" rel="noopener noreferrer">' + esc(opt.title) + '</a>'
+      : '<div class="place-name">' + esc(opt.title) + '</div>';
+
+    var locHtml = opt.location
+      ? '<div class="place-loc-row"><span class="loc-pin">📍</span>' +
+          (locLink
+            ? '<a class="place-loc" href="' + escAttr(locLink) + '" target="_blank" rel="noopener noreferrer">' + esc(opt.location) + '</a>'
+            : '<span class="place-loc">' + esc(opt.location) + '</span>') +
+        '</div>'
+      : '';
+
+    var card = document.createElement('div');
+    card.className = 'place-card';
+    card.innerHTML =
+      topHtml +
+      '<div class="place-body">' +
+        nameHtml +
+        locHtml +
+        (opt.price_range ? '<div><span class="price-pill">' + esc(opt.price_range) + '</span></div>' : '') +
+        (opt.description ? '<p class="place-desc">' + esc(opt.description) + '</p>' : '') +
+        (url ? '<a class="visit-link" href="' + escAttr(url) + '" target="_blank" rel="noopener noreferrer">Visit website →</a>' : '') +
+      '</div>';
+
+    return card;
+  }
+
+  function renderByDay(opts, container) {
+    var map = {}, order = [];
+    opts.forEach(function(o){
+      var k = o.day_label || 'Highlights';
+      if (!map[k]) { map[k] = []; order.push(k); }
+      map[k].push(o);
+    });
+    order.forEach(function(label){
+      var wrap = document.createElement('div');
+      wrap.className = 'day-group';
+      wrap.innerHTML =
+        '<div class="day-hdr">' +
+          '<span class="day-lbl">' + esc(label) + '</span>' +
+          '<div class="day-line"></div>' +
+        '</div>';
+      map[label].forEach(function(o){ wrap.appendChild(makeCard(o)); });
+      container.appendChild(wrap);
+    });
+  }
+
+  function renderByCat(opts, container) {
+    var map = {}, order = [];
+    var CAT_ORDER = ['hotel','restaurant','activity','transport','item','general'];
+    opts.forEach(function(o){
+      var k = o.category || 'general';
+      if (!map[k]) { map[k] = []; order.push(k); }
+      map[k].push(o);
+    });
+    order.sort(function(a,b){
+      return (CAT_ORDER.indexOf(a)+1||99) - (CAT_ORDER.indexOf(b)+1||99);
+    });
+    var multi = order.length > 1;
+    order.forEach(function(cat){
+      var cfg  = CATS[cat] || CATS.general;
+      var wrap = document.createElement('div');
+      wrap.className = 'cat-group';
+      if (multi) {
+        wrap.innerHTML =
+          '<div class="cat-hdr">' +
+            '<span class="cat-emoji">' + cfg.e + '</span>' +
+            '<span class="cat-ttl">' + esc(cfg.label) + '</span>' +
+            '<span class="cat-cnt">(' + map[cat].length + ')</span>' +
+          '</div>';
+      }
+      map[cat].forEach(function(o){ wrap.appendChild(makeCard(o)); });
+      container.appendChild(wrap);
+    });
+  }
+
+  function renderPlan(session, options, ownerName, cityPhotoUrl) {
+    renderHero(session, options, ownerName, cityPhotoUrl);
+
+    var container = $('places-container');
+
+    if (options.length === 0) {
+      container.insertAdjacentHTML('beforeend',
+        '<div class="empty-state">' +
+          '<div class="empty-icon">🗺️</div>' +
+          '<div class="empty-title">No places yet</div>' +
+          '<div class="empty-sub">The planner is still building this itinerary. Open it in Qulture to see it come together.</div>' +
+          '<button class="hero-open-btn" onclick="openApp()" style="margin-top:4px;background:var(--text);color:var(--bg);">Open in Qulture →</button>' +
+        '</div>'
+      );
+      return;
+    }
+
+    var hasDays = options.some(function(o){ return !!o.day_label; });
+    if (hasDays) renderByDay(options, container);
+    else         renderByCat(options, container);
+  }
+
+  function load() {
+    var m = location.pathname.match(/\/shared-plan\/([A-Za-z0-9_]+)/);
+    token = m ? m[1] : null;
+    if (!token) { hide('loading-wrap'); show('error-wrap'); return; }
+
+    fetch('/.netlify/functions/get-shared-plan?token=' + encodeURIComponent(token))
+      .then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function(data){
+        if (data.error) throw new Error(data.error);
+
+        var ctx = data.context || {};
+
+        // Normalize camelCase function response → snake_case used by render helpers
+        var opts = (data.options || []).map(function(o){
+          return {
+            id:          o.id,
+            title:       o.title,
+            category:    o.category,
+            day_label:   o.dayLabel,
+            location:    o.location,
+            price_range: o.priceRange,
+            description: o.description,
+            image_url:   o.imageUrl,
+            url:         o.url,
+            status:      o.status,
+          };
+        });
+
+        var session = {
+          title:        data.title,
+          session_type: data.sessionType,
+          context:      ctx,
+        };
+
+        // For options still missing an image after Google Places, try Wikipedia
+        var poiFetches = opts.map(function(o){
+          if (o.image_url) return Promise.resolve(o.image_url);
+          return fetchWikiPhoto(o.title, o.location);
+        });
+
+        // Hero photo: use server-provided value, fall back to Wikipedia
+        var cityFetch = data.heroImageUrl
+          ? Promise.resolve(data.heroImageUrl)
+          : fetchWikiPhoto(ctx.destination, null);
+
+        return Promise.all([Promise.all(poiFetches), cityFetch]).then(function(results){
+          var photos    = results[0];
+          var cityPhoto = results[1];
+          var enriched  = opts.map(function(o, i){
+            return photos[i] ? Object.assign({}, o, { image_url: photos[i] }) : o;
+          });
+          return { session: session, options: enriched, owner: data.ownerName, cityPhoto: cityPhoto };
+        });
+      })
+      .then(function(data){
+        renderPlan(data.session, data.options, data.owner, data.cityPhoto);
+
+        hide('loading-wrap');
+        show('plan-wrap');
+
+        var barShown = false;
+        function showBar() {
+          if (barShown) return;
+          barShown = true;
+          $('bottom-bar').classList.add('up');
+        }
+        window.addEventListener('scroll', function(){ if (window.scrollY > 80) showBar(); }, { passive:true });
+        setTimeout(showBar, 1200);
+      })
+      .catch(function(err){
+        console.error('Qulture share load error:', err);
+        hide('loading-wrap');
+        show('error-wrap');
+      });
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>

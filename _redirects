@@ -1,3 +1,6 @@
+/shared/*        /shared/index.html        200
+/shared-plan/*   /shared-plan/index.html   200
+
 # Proxy personalized list share links to the backend.
 # URL format: qulture.app/s/{username}/{token}
 # The backend's /s/:username/:token route resolves by token; username is decorative.
