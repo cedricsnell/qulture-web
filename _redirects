@@ -1,2 +1,11 @@
 /shared/*        /shared/index.html        200
 /shared-plan/*   /shared-plan/index.html   200
+
+# Proxy personalized list share links to the backend.
+# URL format: qulture.app/s/{username}/{token}
+# The backend's /s/:username/:token route resolves by token; username is decorative.
+/s/*  https://qulture-backend-api.onrender.com/s/:splat  200
+
+# Proxy personalized taste snapshot links to the backend.
+# URL format: qulture.app/q/{firstName}s-qulture  (e.g. qulture.app/q/cedrics-qulture)
+/q/*  https://qulture-backend-api.onrender.com/q/:splat  200
