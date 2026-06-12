@@ -9,3 +9,12 @@
 # Proxy personalized taste snapshot links to the backend.
 # URL format: qulture.app/q/{firstName}s-qulture  (e.g. qulture.app/q/cedrics-qulture)
 /q/*  https://qulture-backend-api.onrender.com/q/:splat  200
+
+# Taste snapshot token-based pages — served by the backend Express router.
+/taste/*  https://qulture-backend-api.onrender.com/taste/:splat  200
+
+# Proxy well-known verification files to the backend on Render.
+# iOS reads apple-app-site-association to validate universal links (applinks).
+# Android reads assetlinks.json to verify App Links (autoVerify).
+/.well-known/apple-app-site-association  https://qulture-backend-api.onrender.com/.well-known/apple-app-site-association  200
+/.well-known/assetlinks.json             https://qulture-backend-api.onrender.com/.well-known/assetlinks.json             200
