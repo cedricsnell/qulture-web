@@ -13,15 +13,9 @@
 # get-shared-list Netlify function; no backend proxy needed.
 /shared-list/*   /shared-list/index.html   200
 
-# Taste snapshot links — proxied to the backend HTML renderer.
-# Token URLs: qulture.app/taste/{token}
+# Taste snapshot and slug URLs — proxied to the backend HTML renderer.
 /taste/*  https://qulture-backend-api.onrender.com/taste/:splat  200
-
-# Personalized taste snapshot slug URLs: qulture.app/q/{slug}
-/q/*  https://qulture-backend-api.onrender.com/q/:splat  200
-
-# Taste snapshot token-based pages — served by the backend Express router.
-/taste/*  https://qulture-backend-api.onrender.com/taste/:splat  200
+/q/*      https://qulture-backend-api.onrender.com/q/:splat      200
 
 # Proxy well-known verification files to the backend on Render.
 # iOS reads apple-app-site-association to validate universal links (applinks).
