@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-itunes-app" content="app-id=6759091761" />
+
+  <meta id="og-title"  property="og:title"       content="A Qulture List" />
+  <meta id="og-desc"   property="og:description"  content="View this curated list on Qulture." />
+  <meta id="og-image"  property="og:image"        content="https://qulture.app/og-default.png" />
+  <meta               property="og:type"          content="website" />
+  <meta               property="og:site_name"     content="Qulture" />
+  <meta               name="twitter:card"         content="summary_large_image" />
+
+  <title>Qulture — Shared List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #faf9f7;
+      --surf:      #ffffff;
+      --surf2:     #f4f2ef;
+      --border:    rgba(26,23,20,0.08);
+      --border2:   rgba(26,23,20,0.14);
+      --text:      #1a1714;
+      --text2:     #6b6560;
+      --text3:     #a09890;
+      --accent:    #c8965a;
+      --accent-dk: #a67240;
+      --accent-bg: rgba(200,150,90,0.1);
+      --nav-h:     60px;
+      --max-w:     680px;
+      --r:         12px;
+    }
+
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      -webkit-font-smoothing:antialiased;
+      overflow-x:hidden;
+    }
+
+    /* NAV */
+    .nav {
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      height:var(--nav-h);
+      display:flex; align-items:center;
+      padding:0 24px;
+      background:rgba(250,249,247,0.92);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--border);
+    }
+    .nav-inner {
+      max-width:var(--max-w); width:100%; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .nav-logo {
+      display:flex; align-items:center; gap:10px;
+      text-decoration:none; color:var(--text);
+      font-family:'Playfair Display',serif;
+      font-weight:700; font-size:18px; letter-spacing:-0.3px;
+    }
+    .nav-logo-img { height:34px; width:auto; display:block; }
+    .nav-cta {
+      display:inline-flex; align-items:center; gap:5px;
+      background:var(--text); color:var(--bg);
+      font-size:12.5px; font-weight:600; letter-spacing:0.1px;
+      padding:7px 16px; border-radius:20px;
+      text-decoration:none;
+      transition:opacity .15s,transform .15s;
+    }
+    .nav-cta:hover { opacity:.82; transform:translateY(-1px); }
+
+    /* HERO */
+    .hero {
+      position:relative;
+      min-height:420px;
+      display:flex; align-items:flex-end;
+      overflow:hidden;
+    }
+    .hero-bg-ph {
+      position:absolute; inset:0;
+      background:linear-gradient(160deg,#c8b49a,#a08060 50%,#786048);
+    }
+    .hero-bg-photo {
+      position:absolute; inset:0;
+      background-size:cover; background-position:center;
+      opacity:0; transition:opacity 1s ease;
+    }
+    .hero-bg-photo.visible { opacity:1; }
+    .hero-overlay {
+      position:absolute; inset:0;
+      background:linear-gradient(to bottom,
+        rgba(10,7,4,.10) 0%,
+        rgba(10,7,4,.28) 35%,
+        rgba(10,7,4,.68) 68%,
+        rgba(10,7,4,.88) 100%);
+    }
+    .hero-content {
+      position:relative; z-index:1;
+      width:100%; max-width:var(--max-w);
+      margin:0 auto;
+      padding:calc(var(--nav-h) + 56px) 24px 44px;
+    }
+    .hero-pill {
+      display:inline-block;
+      background:rgba(255,255,255,.15);
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
+      border:1px solid rgba(255,255,255,.22);
+      border-radius:20px;
+      padding:4px 14px;
+      font-size:10.5px; font-weight:600;
+      letter-spacing:1.2px; text-transform:uppercase;
+      color:rgba(255,255,255,.88);
+      margin-bottom:16px;
+    }
+    .hero h1 {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(28px,7vw,50px);
+      font-weight:800; line-height:1.05; letter-spacing:-0.5px;
+      color:#fff;
+      margin-bottom:14px;
+    }
+    .hero-byline {
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+      font-size:13.5px; color:rgba(255,255,255,.68);
+      margin-bottom:24px;
+    }
+    .hero-byline strong { color:rgba(255,255,255,.9); font-weight:600; }
+    .hero-byline .dot   { color:rgba(255,255,255,.28); }
+    .hero-open-btn {
+      display:inline-flex; align-items:center; gap:9px;
+      background:#fff; color:var(--text);
+      border:none; border-radius:12px;
+      padding:13px 26px;
+      font-family:'Inter',sans-serif;
+      font-size:15px; font-weight:700;
+      cursor:pointer; text-decoration:none;
+      box-shadow:0 4px 20px rgba(0,0,0,.22);
+      transition:transform .15s,opacity .15s;
+    }
+    .hero-open-btn:hover { transform:translateY(-2px); opacity:.96; }
+    .hero-open-btn .arr { color:var(--accent); }
+
+    /* LIST BODY */
+    .list-body { padding:0 24px 160px; }
+    .list-inner {
+      max-width:var(--max-w); margin:0 auto;
+      padding-top:44px;
+    }
+
+    .eyebrow-row {
+      display:flex; align-items:center; gap:16px;
+      margin-bottom:28px;
+    }
+    .eyebrow-line { flex:1; height:1px; background:var(--border2); }
+    .eyebrow-lbl {
+      font-size:10px; font-weight:700;
+      letter-spacing:2.2px; text-transform:uppercase;
+      color:var(--accent); white-space:nowrap;
+    }
+
+    /* ITEM GRID */
+    .items-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+    @media (min-width:520px) {
+      .items-grid { grid-template-columns:1fr 1fr 1fr; }
+    }
+
+    .item-card {
+      background:var(--surf);
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      overflow:hidden;
+      box-shadow:0 1px 4px rgba(0,0,0,.05);
+      transition:transform .18s,box-shadow .18s;
+      text-decoration:none; color:inherit;
+      display:block;
+    }
+    .item-card.item-card-link { cursor:pointer; }
+    .item-card.item-card-link:hover {
+      transform:translateY(-3px);
+      box-shadow:0 10px 28px rgba(0,0,0,.1);
+    }
+
+    /* Card top — portrait image */
+    .item-top {
+      position:relative;
+      padding-top:133%; /* 3:4 portrait */
+      overflow:hidden;
+    }
+    .item-top img {
+      position:absolute; inset:0;
+      width:100%; height:100%; object-fit:cover;
+      transition:transform .4s;
+      display:block;
+    }
+    .item-card.item-card-link:hover .item-top img { transform:scale(1.04); }
+    .item-ph {
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:44px;
+    }
+
+    /* Placeholder tints per content type */
+    .ph-restaurant, .ph-dining { background:linear-gradient(135deg,#d4907a,#e8b09a); }
+    .ph-place, .ph-travel      { background:linear-gradient(135deg,#8aaa8e,#b0c8b4); }
+    .ph-movie                  { background:linear-gradient(135deg,#5a6e8a,#7a90ab); }
+    .ph-tvshow                 { background:linear-gradient(135deg,#6a5a8a,#8a7aaa); }
+    .ph-book, .ph-books        { background:linear-gradient(135deg,#8a702a,#a89040); }
+    .ph-song, .ph-music        { background:linear-gradient(135deg,#8a4a8a,#aa6aaa); }
+    .ph-album                  { background:linear-gradient(135deg,#4a5a8a,#6a7aaa); }
+    .ph-product, .ph-shopping  { background:linear-gradient(135deg,#6a7a5a,#8a9a7a); }
+    .ph-general                { background:linear-gradient(135deg,#c8a47a,#ddc090); }
+
+    /* Card body */
+    .item-body { padding:12px 13px 13px; }
+    .item-name {
+      font-size:13px; font-weight:700;
+      color:var(--text);
+      line-height:1.35;
+      margin-bottom:5px;
+      display:-webkit-box;
+      -webkit-line-clamp:2; -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+    .item-sub {
+      font-size:11.5px; color:var(--text3);
+      margin-bottom:7px; line-height:1.4;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .item-tag {
+      display:inline-block;
+      font-size:10px; font-weight:600;
+      letter-spacing:.4px; text-transform:uppercase;
+      color:var(--accent-dk);
+      background:var(--accent-bg);
+      border:1px solid rgba(200,150,90,.2);
+      border-radius:5px; padding:2px 7px;
+    }
+
+    /* EMPTY */
+    .empty-state { text-align:center; padding:60px 20px; grid-column:1/-1; }
+    .empty-icon  { font-size:44px; margin-bottom:14px; }
+    .empty-title { font-size:17px; font-weight:700; color:var(--text2); margin-bottom:8px; }
+    .empty-sub   { font-size:14px; color:var(--text3); line-height:1.6; max-width:260px; margin:0 auto; }
+
+    /* LOADING */
+    .loading-wrap {
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      flex-direction:column; gap:16px;
+    }
+    .spinner {
+      width:32px; height:32px;
+      border:2.5px solid rgba(200,150,90,.2);
+      border-top-color:var(--accent);
+      border-radius:50%;
+      animation:spin .75s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-txt { font-size:13.5px; color:var(--text3); }
+
+    /* ERROR */
+    .error-wrap {
+      min-height:100vh;
+      padding:calc(var(--nav-h) + 60px) 24px 60px;
+      display:flex; align-items:center; justify-content:center;
+      flex-direction:column; gap:14px; text-align:center;
+    }
+    .error-icon  { font-size:42px; }
+    .error-title {
+      font-family:'Playfair Display',serif;
+      font-size:24px; font-weight:800; letter-spacing:-.3px;
+    }
+    .error-sub { font-size:14px; color:var(--text2); max-width:300px; line-height:1.6; }
+    .error-btn {
+      display:inline-flex; align-items:center; gap:8px;
+      background:var(--text); color:var(--bg);
+      border:none; border-radius:12px;
+      padding:13px 26px; margin-top:8px;
+      font-family:'Inter',sans-serif;
+      font-size:15px; font-weight:700;
+      cursor:pointer; text-decoration:none;
+      transition:opacity .15s;
+    }
+    .error-btn:hover { opacity:.82; }
+
+    /* PROMO FOOTER */
+    .promo {
+      background:var(--surf);
+      border-top:1px solid var(--border);
+      padding:52px 24px;
+      text-align:center;
+    }
+    .promo-inner { max-width:360px; margin:0 auto; }
+    .promo-logo-wrap {
+      background:#000;
+      border-radius:16px;
+      padding:10px 20px;
+      display:inline-flex; align-items:center; justify-content:center;
+      margin:0 auto 18px;
+    }
+    .promo-logo-img { height:48px; width:auto; display:block; }
+    .promo-name {
+      font-family:'Playfair Display',serif;
+      font-size:24px; font-weight:800; color:var(--text);
+      margin-bottom:10px;
+    }
+    .promo-tag { font-size:14px; color:var(--text2); line-height:1.6; margin-bottom:28px; }
+    .store-badge img { height:44px; }
+    .promo-credit { margin-top:24px; font-size:11.5px; color:var(--text3); }
+
+    /* BOTTOM BAR */
+    .bottom-bar {
+      position:fixed; bottom:0; left:0; right:0; z-index:50;
+      background:rgba(250,249,247,.94);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      border-top:1px solid var(--border);
+      padding:12px 16px;
+      padding-bottom:max(12px,env(safe-area-inset-bottom));
+      display:flex; gap:10px; align-items:center;
+      transform:translateY(100%);
+      transition:transform .35s cubic-bezier(.4,0,.2,1);
+    }
+    .bottom-bar.up { transform:translateY(0); }
+    .bb-open {
+      flex:1; background:var(--text); color:var(--bg);
+      border:none; border-radius:12px;
+      padding:13px 20px;
+      font-family:'Inter',sans-serif;
+      font-size:15px; font-weight:700;
+      cursor:pointer; text-align:center;
+      transition:opacity .15s;
+    }
+    .bb-open:hover { opacity:.84; }
+    .bb-dl {
+      font-size:12px; font-weight:600;
+      color:var(--text2); text-decoration:none;
+      white-space:nowrap; padding:8px 4px;
+    }
+    .bb-dl:hover { color:var(--text); }
+
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="https://qulture.app" class="nav-logo">
+      <img src="/qulture-logo.png" alt="Qulture" class="nav-logo-img" />
+      Qulture
+    </a>
+    <a href="https://apps.apple.com/app/id6759091761" class="nav-cta" target="_blank" rel="noopener">
+      ↓ Get the App
+    </a>
+  </div>
+</nav>
+
+<div id="loading-wrap" class="loading-wrap">
+  <div class="spinner"></div>
+  <div class="loading-txt">Loading list…</div>
+</div>
+
+<div id="error-wrap" class="error-wrap hidden">
+  <div class="error-icon">📋</div>
+  <div id="error-title" class="error-title">List not found</div>
+  <div id="error-sub" class="error-sub">This link may have expired or been removed. Ask the creator to share it again.</div>
+  <a href="https://apps.apple.com/app/id6759091761" class="error-btn" target="_blank" rel="noopener">
+    Get Qulture Free →
+  </a>
+</div>
+
+<div id="list-wrap" class="hidden">
+
+  <section class="hero" id="hero">
+    <div class="hero-bg-ph" id="hero-ph"></div>
+    <div class="hero-bg-photo" id="hero-photo"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-pill" id="list-eyebrow">Collection</div>
+      <h1 id="list-title">—</h1>
+      <div class="hero-byline" id="list-byline"></div>
+      <button class="hero-open-btn" onclick="openApp()">
+        Save to Qulture <span class="arr">→</span>
+      </button>
+    </div>
+  </section>
+
+  <div class="list-body">
+    <div class="list-inner">
+      <div class="eyebrow-row">
+        <div class="eyebrow-line"></div>
+        <span class="eyebrow-lbl" id="items-eyebrow">The List</span>
+        <div class="eyebrow-line"></div>
+      </div>
+      <div class="items-grid" id="items-grid"></div>
+    </div>
+  </div>
+
+  <section class="promo">
+    <div class="promo-inner">
+      <div class="promo-logo-wrap">
+        <img src="/qulture-logo.png" alt="Qulture" class="promo-logo-img" />
+      </div>
+      <div class="promo-name">Qulture</div>
+      <div class="promo-tag">Build your cross-domain taste graph — films, dining, music, books, and every place in between.</div>
+      <a href="https://apps.apple.com/app/id6759091761" class="store-badge" target="_blank" rel="noopener">
+        <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83"
+             alt="Download on the App Store" loading="lazy" />
+      </a>
+      <div class="promo-credit">Made with ♥ by Proprius Labs</div>
+    </div>
+  </section>
+</div>
+
+<div class="bottom-bar" id="bottom-bar">
+  <button class="bb-open" onclick="openApp()">Save to Qulture</button>
+  <a href="https://apps.apple.com/app/id6759091761" class="bb-dl" target="_blank" rel="noopener">↓ Free</a>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var ITEM_META = {
+    restaurant: { label:'Dining',   e:'🍽️',  ph:'ph-restaurant', link:mapLink  },
+    place:      { label:'Place',    e:'📍',   ph:'ph-place',      link:mapLink  },
+    movie:      { label:'Film',     e:'🎬',   ph:'ph-movie',      link:jwLink   },
+    tvshow:     { label:'TV',       e:'📺',   ph:'ph-tvshow',     link:jwLink   },
+    book:       { label:'Book',     e:'📚',   ph:'ph-book',       link:bookLink },
+    song:       { label:'Song',     e:'🎵',   ph:'ph-song',       link:spotLink },
+    music:      { label:'Music',    e:'🎵',   ph:'ph-music',      link:spotLink },
+    album:      { label:'Album',    e:'💿',   ph:'ph-album',      link:spotLink },
+    product:    { label:'Product',  e:'🛍️',  ph:'ph-product',    link:asinLink },
+  };
+
+  var LIST_TYPE_LABEL = {
+    travel:   'Travel List',
+    dining:   'Dining List',
+    film:     'Watch List',
+    books:    'Reading List',
+    music:    'Playlist',
+    shopping: 'Shopping List',
+    places:   'Places List',
+    general:  'Collection',
+  };
+
+  function mapLink(item)  {
+    if (item.sourceUrl) return item.sourceUrl;
+    var q = item.location ? item.title + ' ' + item.location : item.title;
+    return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+  }
+  function jwLink(item)   {
+    return item.sourceUrl || 'https://www.justwatch.com/us/search?q=' + encodeURIComponent(item.title);
+  }
+  function bookLink(item) {
+    return item.sourceUrl || 'https://bookshop.org/search?keywords=' + encodeURIComponent(item.title);
+  }
+  function spotLink(item) {
+    return item.sourceUrl || 'https://open.spotify.com/search/' + encodeURIComponent(item.title);
+  }
+  function asinLink(item) {
+    return item.sourceUrl || 'https://www.amazon.com/s?k=' + encodeURIComponent(item.title);
+  }
+
+  var token = null;
+
+  function $(id)    { return document.getElementById(id); }
+  function show(id) { $(id).classList.remove('hidden'); }
+  function hide(id) { $(id).classList.add('hidden'); }
+
+  function esc(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escAttr(s) { return esc(s).replace(/'/g,'&#39;'); }
+
+  window.openApp = function () {
+    if (!token) return;
+    window.location.href = 'qulture://shared-list/' + token;
+  };
+
+  function metaFor(itemType) {
+    return ITEM_META[(itemType || '').toLowerCase()] || { label:'Item', e:'✨', ph:'ph-general', link:function(i){ return i.sourceUrl||null; } };
+  }
+
+  function renderHero(data) {
+    var lt = LIST_TYPE_LABEL[(data.listType || '').toLowerCase()] || 'Collection';
+    $('list-eyebrow').textContent = lt;
+    $('items-eyebrow').textContent = lt;
+
+    $('list-title').textContent = data.listName;
+    document.title = data.listName + ' — Qulture';
+    $('og-title').content = data.listName + ' — Qulture';
+
+    var cnt = data.items.length;
+    $('list-byline').innerHTML =
+      '<span>Curated by <strong>' + esc(data.ownerName) + '</strong></span>' +
+      '<span class="dot">·</span>' +
+      '<span>' + cnt + ' ' + (cnt === 1 ? 'item' : 'items') + '</span>';
+    $('og-desc').content = cnt + ' items curated by ' + data.ownerName + ' on Qulture';
+
+    var firstImg = data.items.find(function (i) { return i.imageUrl; });
+    if (firstImg) {
+      var el = $('hero-photo');
+      el.style.backgroundImage = 'url(' + encodeURI(firstImg.imageUrl) + ')';
+      el.classList.add('visible');
+      $('og-image').content = firstImg.imageUrl;
+    }
+  }
+
+  function makeCard(item) {
+    var m    = metaFor(item.itemType);
+    var link = m.link(item);
+    var sub  = item.location || item.cuisine || item.description || '';
+
+    var imgHtml;
+    if (item.imageUrl) {
+      imgHtml =
+        '<img src="' + escAttr(item.imageUrl) + '"' +
+        ' alt="' + escAttr(item.title) + '"' +
+        ' loading="lazy"' +
+        ' onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'" />' +
+        '<div class="item-ph ' + m.ph + '" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:44px">' + m.e + '</div>';
+    } else {
+      imgHtml = '<div class="item-ph ' + m.ph + '" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:44px">' + m.e + '</div>';
+    }
+
+    var bodyHtml =
+      '<div class="item-body">' +
+        '<div class="item-name">' + esc(item.title) + '</div>' +
+        (sub ? '<div class="item-sub">' + esc(sub.slice(0, 55)) + '</div>' : '') +
+        '<span class="item-tag">' + esc(m.label) + '</span>' +
+      '</div>';
+
+    var card = document.createElement(link ? 'a' : 'div');
+    card.className = 'item-card' + (link ? ' item-card-link' : '');
+    if (link) {
+      card.href    = link;
+      card.target  = '_blank';
+      card.rel     = 'noopener noreferrer';
+    }
+    card.innerHTML =
+      '<div class="item-top">' + imgHtml + '</div>' +
+      bodyHtml;
+
+    return card;
+  }
+
+  function renderItems(items) {
+    var grid = $('items-grid');
+    if (!items || items.length === 0) {
+      grid.innerHTML =
+        '<div class="empty-state">' +
+          '<div class="empty-icon">📋</div>' +
+          '<div class="empty-title">Nothing here yet</div>' +
+          '<div class="empty-sub">This list is empty. Open Qulture to start adding items.</div>' +
+        '</div>';
+      return;
+    }
+    items.forEach(function (item) { grid.appendChild(makeCard(item)); });
+  }
+
+  function load() {
+    var m = location.pathname.match(/\/shared-list\/([A-Za-z0-9_-]+)/);
+    token = m ? m[1] : null;
+    if (!token) { hide('loading-wrap'); show('error-wrap'); return; }
+
+    fetch('/.netlify/functions/get-shared-list?token=' + encodeURIComponent(token))
+      .then(function (r) { return r.ok ? r.json() : r.json().then(function(e){ throw e; }); })
+      .then(function (data) {
+        if (data.error === 'not_found' || data.error === 'list_not_found') {
+          throw { type: 'not_found' };
+        }
+        if (data.isExpired) {
+          throw { type: 'expired' };
+        }
+
+        renderHero(data);
+        renderItems(data.items);
+
+        hide('loading-wrap');
+        show('list-wrap');
+
+        var barShown = false;
+        function showBar() {
+          if (barShown) return;
+          barShown = true;
+          $('bottom-bar').classList.add('up');
+        }
+        window.addEventListener('scroll', function () { if (window.scrollY > 80) showBar(); }, { passive: true });
+        setTimeout(showBar, 1200);
+      })
+      .catch(function (err) {
+        console.error('Qulture list load error:', err);
+        if (err && err.type === 'expired') {
+          $('error-title').textContent = 'Link expired';
+          $('error-sub').textContent = 'This share link has expired. Ask the creator to share a new one.';
+        } else if (err && err.type === 'not_found') {
+          $('error-title').textContent = 'List not found';
+          $('error-sub').textContent = 'This link may have been removed. Ask the creator to share it again.';
+        }
+        hide('loading-wrap');
+        show('error-wrap');
+      });
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>

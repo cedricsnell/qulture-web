@@ -9,8 +9,15 @@
 
 /shared-plan/*   /shared-plan/index.html   200
 
-# Proxy personalized taste snapshot links to the backend.
-# URL format: qulture.app/q/{firstName}s-qulture  (e.g. qulture.app/q/cedrics-qulture)
+# Canonical list share URL — served by local HTML that fetches from the
+# get-shared-list Netlify function; no backend proxy needed.
+/shared-list/*   /shared-list/index.html   200
+
+# Taste snapshot links — proxied to the backend HTML renderer.
+# Token URLs: qulture.app/taste/{token}
+/taste/*  https://qulture-backend-api.onrender.com/taste/:splat  200
+
+# Personalized taste snapshot slug URLs: qulture.app/q/{slug}
 /q/*  https://qulture-backend-api.onrender.com/q/:splat  200
 
 # Taste snapshot token-based pages — served by the backend Express router.
