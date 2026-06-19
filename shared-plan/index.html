@@ -639,6 +639,21 @@
     return wikiSearchPhoto(baseQuery + ' ' + locationPart);
   }
 
+  // Called when a stored place image fails (e.g. expired Google Places URL).
+  // Fetches a Wikipedia photo and swaps it in so the card still shows a thumbnail.
+  window.wikiImgFallback = function(imgEl) {
+    imgEl.style.display = 'none';
+    var title = imgEl.dataset.title || '';
+    var loc   = imgEl.dataset.loc   || '';
+    if (!title) return;
+    fetchWikiPhoto(title, loc || null).then(function(url) {
+      if (!url) return;
+      imgEl.removeAttribute('onerror');
+      imgEl.src = url;
+      imgEl.style.display = '';
+    });
+  };
+
   window.openApp = function() {
     if (!token) return;
     window.location.href = 'qulture://shared-plan/' + token;
@@ -704,8 +719,10 @@
           ? '<img class="place-img"' +
               ' src="' + escAttr(opt.image_url) + '"' +
               ' alt="' + escAttr(opt.title) + '"' +
+              ' data-title="' + escAttr(opt.title) + '"' +
+              ' data-loc="' + escAttr(opt.location || '') + '"' +
               ' loading="lazy"' +
-              ' onerror="this.style.display=\'none\'" />'
+              ' onerror="wikiImgFallback(this)" />'
           : '') +
         '<div class="top-overlay">' +
           '<span class="cat-tag">' + esc(cat.label) + '</span>' +
