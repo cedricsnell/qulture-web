@@ -616,7 +616,7 @@
           `Shared by ${data.ownerName} · ${itemCount} ${itemCount === 1 ? 'item' : 'items'}`;
 
         // Open-in-app deep link
-        document.getElementById('open-in-app').href = `qulture://shared/${token}`;
+        document.getElementById('open-in-app').href = `qulture://shared-list/${token}`;
 
         // Update page title + OG
         document.title = `${data.listName} — Qulture`;
@@ -637,7 +637,7 @@
         // Attempt to deep-link into the app immediately on mobile
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
           setTimeout(() => {
-            window.location.href = `qulture://shared/${token}`;
+            window.location.href = `qulture://shared-list/${token}`;
           }, 1200); // small delay so user sees the list content first
         }
 
