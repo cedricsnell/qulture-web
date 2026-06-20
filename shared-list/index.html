@@ -524,6 +524,87 @@
     }
   }
 
+  // ── Image fallback helpers ─────────────────────────────────────────────────
+  function listItunes(type, title) {
+    var entityMap = { movie:'movie', tvshow:'tvSeason', song:'musicTrack', music:'musicTrack', album:'album' };
+    var entity = entityMap[(type || '').toLowerCase()] || 'all';
+    return fetch('https://itunes.apple.com/search?term=' + encodeURIComponent(title) + '&entity=' + entity + '&limit=1')
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        var res = d.results && d.results[0];
+        if (!res) return null;
+        var art = res.artworkUrl100;
+        return art ? art.replace('100x100bb', '600x600bb') : null;
+      })
+      .catch(function(){ return null; });
+  }
+
+  function listOpenLibrary(title) {
+    return fetch('https://openlibrary.org/search.json?q=' + encodeURIComponent(title) + '&fields=cover_i&limit=1')
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        var id = d.docs && d.docs[0] && d.docs[0].cover_i;
+        return id ? 'https://covers.openlibrary.org/b/id/' + id + '-L.jpg' : null;
+      })
+      .catch(function(){ return null; });
+  }
+
+  function listWikiSearch(query) {
+    return fetch(
+      'https://en.wikipedia.org/w/api.php?action=query&list=search'
+      + '&srsearch=' + encodeURIComponent(query)
+      + '&srlimit=1&srprop=&format=json&origin=*'
+    )
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if (!d) return null;
+      var hits = d.query && d.query.search;
+      if (!hits || hits.length === 0) return null;
+      return fetch(
+        'https://en.wikipedia.org/w/api.php?action=query&pageids=' + hits[0].pageid
+        + '&prop=pageimages&pithumbsize=800&format=json&origin=*'
+      );
+    })
+    .then(function(r){ return r && r.ok ? r.json() : null; })
+    .then(function(d){
+      if (!d) return null;
+      var pages = d.query && d.query.pages;
+      if (!pages) return null;
+      var page = Object.values(pages)[0];
+      return (page && page.thumbnail && page.thumbnail.source) || null;
+    })
+    .catch(function(){ return null; });
+  }
+
+  window.listImgFallback = function(img) {
+    var type  = img.dataset.type  || '';
+    var title = img.dataset.title || '';
+    var loc   = img.dataset.loc   || '';
+    var ph    = img.parentNode && img.parentNode.querySelector('.item-ph');
+    function showPh() { img.style.display = 'none'; if (ph) ph.style.display = 'flex'; }
+
+    img.onerror = null;
+    var t = type.toLowerCase();
+    var p;
+    if (t === 'movie' || t === 'tvshow') {
+      p = listItunes(t, title);
+    } else if (t === 'book') {
+      p = listOpenLibrary(title);
+    } else if (t === 'song' || t === 'music' || t === 'album') {
+      p = listItunes(t, title);
+    } else if (t === 'restaurant' || t === 'place') {
+      p = listWikiSearch(loc ? title + ' ' + loc : title);
+    } else {
+      showPh();
+      return;
+    }
+
+    p.then(function(url) {
+      if (url) { img.src = url; }
+      else { showPh(); }
+    });
+  };
+
   function makeCard(item) {
     var m    = metaFor(item.itemType);
     var link = m.link(item);
@@ -534,8 +615,11 @@
       imgHtml =
         '<img src="' + escAttr(item.imageUrl) + '"' +
         ' alt="' + escAttr(item.title) + '"' +
+        ' data-type="' + escAttr(item.itemType || '') + '"' +
+        ' data-title="' + escAttr(item.title) + '"' +
+        ' data-loc="' + escAttr(item.location || '') + '"' +
         ' loading="lazy"' +
-        ' onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'" />' +
+        ' onerror="listImgFallback(this)" />' +
         '<div class="item-ph ' + m.ph + '" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:44px">' + m.e + '</div>';
     } else {
       imgHtml = '<div class="item-ph ' + m.ph + '" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:44px">' + m.e + '</div>';
