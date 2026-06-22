@@ -71,7 +71,7 @@ exports.handler = async (event) => {
     // 2. Fetch list + items + owner profile in parallel
     const [listRes, ownerRes] = await Promise.all([
       fetch(
-        `${base}/lists?id=eq.${share.list_id}&select=id,name,type,color,list_items(id,title,description,image_url,item_type,source_url,metadata)&limit=1`,
+        `${base}/lists?id=eq.${share.list_id}&select=id,name,type,color,list_items(id,title,description,image_url,item_type,metadata)&limit=1`,
         { headers }
       ),
       fetch(
@@ -108,7 +108,7 @@ exports.handler = async (event) => {
         description: item.description || null,
         imageUrl: item.image_url || null,
         itemType: item.item_type,
-        sourceUrl: item.source_url || null,
+        sourceUrl: item.metadata?.url || item.metadata?.sourceUrl || null,
         location: item.metadata?.location || null,
         cuisine: item.metadata?.cuisine || null,
         priceRange: item.metadata?.priceRange || null,
