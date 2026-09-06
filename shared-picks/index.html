@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-itunes-app" content="app-id=6759091761" />
+
+  <!-- OG tags — populated dynamically once data loads -->
+  <meta id="og-title"  property="og:title"       content="Picks from Qulture" />
+  <meta id="og-desc"   property="og:description"  content="Taste-matched picks for tonight." />
+  <meta id="og-image"  property="og:image"        content="https://qulture.app/og-default.png" />
+  <meta               property="og:type"          content="website" />
+  <meta               property="og:site_name"     content="Qulture" />
+  <meta               name="twitter:card"         content="summary_large_image" />
+
+  <title>Picks — Qulture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Design tokens ─────────────────────────────────────────────────────── */
+    :root {
+      /* Cinematic dark palette — permanent; this page is intentionally always dark */
+      --bg:         #09090f;
+      --surf:       #111118;
+      --surf2:      #181820;
+      --border:     rgba(255,255,255,0.07);
+      --border2:    rgba(255,255,255,0.12);
+      --text:       #f0eef8;
+      --text2:      #a09ab8;
+      --text3:      #5a5478;
+      --accent:     #8b7cf8;        /* soft purple — Qulture brand */
+      --accent-dk:  #6d5ce4;
+      --accent-bg:  rgba(139,124,248,0.12);
+      --gold:       #c8a84a;
+      --nav-h:      58px;
+      --max-w:      680px;
+      --r:          14px;
+      --r-sm:       8px;
+    }
+
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      -webkit-font-smoothing:antialiased;
+      overflow-x:hidden;
+    }
+
+    /* ── Nav ───────────────────────────────────────────────────────────────── */
+    .nav {
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      height:var(--nav-h);
+      display:flex; align-items:center;
+      padding:0 20px;
+      background:rgba(9,9,15,0.88);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
+    }
+    .nav-inner {
+      max-width:var(--max-w); width:100%; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .nav-logo {
+      display:flex; align-items:center; gap:9px;
+      text-decoration:none; color:var(--text);
+      font-family:'Playfair Display',serif;
+      font-weight:700; font-size:17px; letter-spacing:-0.2px;
+    }
+    .nav-logo-img { height:30px; width:auto; display:block; }
+    .nav-cta {
+      display:inline-flex; align-items:center; gap:4px;
+      background:var(--accent); color:#fff;
+      font-size:12px; font-weight:700; letter-spacing:0.2px;
+      padding:6px 15px; border-radius:20px;
+      text-decoration:none;
+      transition:opacity .15s,transform .15s;
+    }
+    .nav-cta:hover { opacity:.85; transform:translateY(-1px); }
+
+    /* ── Hero ──────────────────────────────────────────────────────────────── */
+    .hero {
+      position:relative;
+      min-height:420px;
+      display:flex; align-items:flex-end;
+      overflow:hidden;
+      margin-top:var(--nav-h);
+    }
+    .hero-bg-ph {
+      position:absolute; inset:0;
+      background:linear-gradient(135deg,#1a0f2e 0%,#0d0720 50%,#09090f 100%);
+    }
+    .hero-bg-photo {
+      position:absolute; inset:0;
+      background-size:cover; background-position:center top;
+      opacity:0; transition:opacity 1.2s ease;
+    }
+    .hero-bg-photo.visible { opacity:1; }
+    .hero-overlay {
+      position:absolute; inset:0;
+      background:linear-gradient(to bottom,
+        rgba(9,9,15,.08)  0%,
+        rgba(9,9,15,.35)  30%,
+        rgba(9,9,15,.72)  62%,
+        rgba(9,9,15,.96)  100%);
+    }
+    .hero-content {
+      position:relative; z-index:1;
+      width:100%; max-width:var(--max-w);
+      margin:0 auto;
+      padding:40px 20px 44px;
+    }
+    .hero-pill {
+      display:inline-block;
+      background:rgba(139,124,248,.18);
+      border:1px solid rgba(139,124,248,.30);
+      border-radius:20px;
+      padding:4px 13px;
+      font-size:10px; font-weight:700;
+      letter-spacing:1.4px; text-transform:uppercase;
+      color:var(--accent);
+      margin-bottom:16px;
+    }
+    .hero h1 {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(26px,7vw,46px);
+      font-weight:800; line-height:1.08; letter-spacing:-0.4px;
+      color:#fff;
+      margin-bottom:14px;
+    }
+    .hero-byline {
+      display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+      font-size:13px; color:rgba(255,255,255,.52);
+      margin-bottom:26px;
+    }
+    .hero-byline strong { color:rgba(255,255,255,.80); font-weight:600; }
+    .hero-byline .dot   { color:rgba(255,255,255,.22); }
+    .hero-open-btn {
+      display:inline-flex; align-items:center; gap:8px;
+      background:var(--accent); color:#fff;
+      border:none; border-radius:var(--r);
+      padding:12px 24px;
+      font-family:'Inter',sans-serif;
+      font-size:14px; font-weight:700;
+      cursor:pointer; text-decoration:none;
+      box-shadow:0 4px 24px rgba(139,124,248,.35);
+      transition:transform .15s,opacity .15s;
+    }
+    .hero-open-btn:hover { transform:translateY(-2px); opacity:.92; }
+
+    /* ── Picks list ────────────────────────────────────────────────────────── */
+    .picks-body {
+      padding:0 20px 140px;
+    }
+    .picks-inner {
+      max-width:var(--max-w); margin:0 auto;
+      padding-top:40px;
+    }
+    .section-label {
+      display:flex; align-items:center; gap:14px;
+      margin-bottom:28px;
+    }
+    .section-line { flex:1; height:1px; background:var(--border2); }
+    .section-lbl {
+      font-size:9.5px; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase;
+      color:var(--accent); white-space:nowrap;
+    }
+
+    /* ── Pick card ─────────────────────────────────────────────────────────── */
+    .pick-card {
+      display:flex; align-items:flex-start; gap:16px;
+      background:var(--surf);
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      overflow:hidden;
+      margin-bottom:14px;
+      transition:transform .18s, border-color .18s, box-shadow .18s;
+    }
+    .pick-card:hover {
+      transform:translateY(-3px);
+      border-color:var(--border2);
+      box-shadow:0 12px 36px rgba(0,0,0,.40);
+    }
+
+    /* Poster column */
+    .poster-col {
+      flex-shrink:0;
+      width:90px;
+      position:relative;
+      background:var(--surf2);
+      align-self:stretch;
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+    }
+    .poster-ph {
+      font-size:32px; opacity:.45;
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .poster-img {
+      position:absolute; inset:0;
+      width:100%; height:100%; object-fit:cover;
+      transition:opacity .4s;
+      opacity:0;
+    }
+    .poster-img.loaded { opacity:1; }
+
+    /* Info column */
+    .pick-info {
+      flex:1; min-width:0;
+      padding:16px 16px 16px 0;
+    }
+    .pick-num {
+      font-size:10px; font-weight:700;
+      letter-spacing:1.2px; text-transform:uppercase;
+      color:var(--text3);
+      margin-bottom:6px;
+    }
+    .pick-title {
+      font-family:'Playfair Display',serif;
+      font-size:17px; font-weight:700; line-height:1.22;
+      color:var(--text);
+      margin-bottom:7px;
+      display:block; text-decoration:none;
+    }
+    a.pick-title:hover { color:var(--accent); }
+    .pick-meta {
+      display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .meta-pill {
+      display:inline-block;
+      font-size:10.5px; font-weight:600;
+      padding:2px 9px; border-radius:5px;
+      background:var(--surf2);
+      color:var(--text2);
+      border:1px solid var(--border2);
+    }
+    .streaming-pill {
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:10.5px; font-weight:600;
+      padding:2px 9px; border-radius:5px;
+      background:var(--accent-bg);
+      color:var(--accent);
+      border:1px solid rgba(139,124,248,.22);
+      text-decoration:none;
+    }
+    .streaming-pill:hover { opacity:.82; }
+    .pick-reason {
+      font-size:12.5px; color:var(--text2);
+      line-height:1.58;
+      font-style:italic;
+    }
+
+    /* ── Loading / Error / Empty ─────────────────────────────────────────── */
+    .loading-wrap {
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      flex-direction:column; gap:14px;
+    }
+    .spinner {
+      width:28px; height:28px;
+      border:2.5px solid rgba(139,124,248,.18);
+      border-top-color:var(--accent);
+      border-radius:50%;
+      animation:spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-txt { font-size:13px; color:var(--text3); }
+
+    .error-wrap {
+      min-height:100vh;
+      padding:calc(var(--nav-h) + 60px) 24px 60px;
+      display:flex; align-items:center; justify-content:center;
+      flex-direction:column; gap:12px; text-align:center;
+    }
+    .error-icon  { font-size:40px; }
+    .error-title {
+      font-family:'Playfair Display',serif;
+      font-size:22px; font-weight:800; letter-spacing:-.2px;
+    }
+    .error-sub { font-size:13.5px; color:var(--text2); max-width:280px; line-height:1.6; }
+    .error-btn {
+      display:inline-flex; align-items:center; gap:7px;
+      background:var(--accent); color:#fff;
+      border:none; border-radius:var(--r);
+      padding:12px 24px; margin-top:6px;
+      font-family:'Inter',sans-serif;
+      font-size:14px; font-weight:700;
+      cursor:pointer; text-decoration:none;
+      transition:opacity .15s;
+    }
+    .error-btn:hover { opacity:.82; }
+
+    .empty-state { text-align:center; padding:60px 20px; }
+    .empty-icon  { font-size:44px; margin-bottom:14px; }
+    .empty-title { font-size:17px; font-weight:700; color:var(--text2); margin-bottom:8px; }
+    .empty-sub   { font-size:13.5px; color:var(--text3); line-height:1.6; }
+
+    /* ── Promo footer ─────────────────────────────────────────────────────── */
+    .promo {
+      background:var(--surf);
+      border-top:1px solid var(--border);
+      padding:48px 20px;
+      text-align:center;
+    }
+    .promo-inner { max-width:340px; margin:0 auto; }
+    .promo-logo-wrap {
+      background:#000;
+      border-radius:14px;
+      padding:8px 18px;
+      display:inline-flex; align-items:center; justify-content:center;
+      margin:0 auto 16px;
+      border:1px solid var(--border2);
+    }
+    .promo-logo-img { height:44px; width:auto; display:block; }
+    .promo-name {
+      font-family:'Playfair Display',serif;
+      font-size:22px; font-weight:800; color:var(--text);
+      margin-bottom:9px;
+    }
+    .promo-tag { font-size:13.5px; color:var(--text2); line-height:1.6; margin-bottom:24px; }
+    .store-badge img { height:42px; }
+    .promo-credit { margin-top:20px; font-size:11px; color:var(--text3); }
+
+    /* ── Sticky bottom bar ────────────────────────────────────────────────── */
+    .bottom-bar {
+      position:fixed; bottom:0; left:0; right:0; z-index:50;
+      background:rgba(9,9,15,.94);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border-top:1px solid var(--border);
+      padding:12px 16px;
+      padding-bottom:max(12px,env(safe-area-inset-bottom));
+      display:flex; gap:10px; align-items:center;
+      transform:translateY(100%);
+      transition:transform .35s cubic-bezier(.4,0,.2,1);
+    }
+    .bottom-bar.up { transform:translateY(0); }
+    .bb-open {
+      flex:1; background:var(--accent); color:#fff;
+      border:none; border-radius:var(--r);
+      padding:13px 20px;
+      font-family:'Inter',sans-serif;
+      font-size:14px; font-weight:700;
+      cursor:pointer; text-align:center;
+      transition:opacity .15s;
+      box-shadow:0 4px 20px rgba(139,124,248,.30);
+    }
+    .bb-open:hover { opacity:.86; }
+    .bb-dl {
+      font-size:11.5px; font-weight:600;
+      color:var(--text2); text-decoration:none;
+      white-space:nowrap; padding:8px 2px;
+    }
+    .bb-dl:hover { color:var(--text); }
+
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="https://qulture.app" class="nav-logo">
+      <img src="/qulture-logo.png" alt="Qulture" class="nav-logo-img" />
+      Qulture
+    </a>
+    <a href="https://apps.apple.com/app/id6759091761" class="nav-cta" target="_blank" rel="noopener">
+      ↓ Get the App
+    </a>
+  </div>
+</nav>
+
+<!-- Loading state -->
+<div id="loading-wrap" class="loading-wrap">
+  <div class="spinner"></div>
+  <div class="loading-txt">Loading picks…</div>
+</div>
+
+<!-- Error state -->
+<div id="error-wrap" class="error-wrap hidden">
+  <div class="error-icon">🎬</div>
+  <div class="error-title">Picks not found</div>
+  <div class="error-sub">This link may have expired or been removed. Ask for a fresh share.</div>
+  <a href="https://apps.apple.com/app/id6759091761" class="error-btn" target="_blank" rel="noopener">
+    Get Qulture Free →
+  </a>
+</div>
+
+<!-- Main content (hidden until loaded) -->
+<div id="picks-wrap" class="hidden">
+
+  <section class="hero" id="hero">
+    <div class="hero-bg-ph"></div>
+    <div class="hero-bg-photo" id="hero-photo"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-pill">Tonight's Picks</div>
+      <h1 id="hero-headline">Picks from Qulture</h1>
+      <div class="hero-byline" id="hero-byline"></div>
+      <button class="hero-open-btn" onclick="openApp()">
+        Open in Qulture →
+      </button>
+    </div>
+  </section>
+
+  <div class="picks-body">
+    <div class="picks-inner">
+      <div class="section-label">
+        <div class="section-line"></div>
+        <span class="section-lbl">The Picks</span>
+        <div class="section-line"></div>
+      </div>
+      <div id="picks-container"></div>
+    </div>
+  </div>
+
+  <section class="promo">
+    <div class="promo-inner">
+      <div class="promo-logo-wrap">
+        <img src="/qulture-logo.png" alt="Qulture" class="promo-logo-img" />
+      </div>
+      <div class="promo-name">Qulture</div>
+      <div class="promo-tag">The taste graph that finds what you'll both love — films, restaurants, music, travel.</div>
+      <a href="https://apps.apple.com/app/id6759091761" class="store-badge" target="_blank" rel="noopener">
+        <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83"
+             alt="Download on the App Store" loading="lazy" />
+      </a>
+      <div class="promo-credit">Made with ♥ by Proprius Labs</div>
+    </div>
+  </section>
+</div>
+
+<!-- Sticky bottom bar -->
+<div class="bottom-bar" id="bottom-bar">
+  <button class="bb-open" onclick="openApp()">Open in Qulture</button>
+  <a href="https://apps.apple.com/app/id6759091761" class="bb-dl" target="_blank" rel="noopener">↓ Free</a>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var token = null;
+
+  function $(id)   { return document.getElementById(id); }
+  function show(id){ $(id).classList.remove('hidden'); }
+  function hide(id){ $(id).classList.add('hidden'); }
+
+  function esc(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escAttr(s) { return esc(s).replace(/'/g,'&#39;'); }
+
+  function safeUrl(s) {
+    if (!s) return null;
+    try {
+      var u = new URL(s);
+      return (u.protocol === 'https:' || u.protocol === 'http:') ? s : null;
+    } catch(_) { return null; }
+  }
+
+  window.openApp = function() {
+    if (!token) return;
+    window.location.href = 'qulture://shared-picks/' + token;
+  };
+
+  // Streaming service → emoji for the badge
+  var SERVICE_EMOJI = {
+    netflix:   '🔴',
+    hulu:      '🟢',
+    disney:    '✨',
+    'apple tv': '🍎',
+    'amazon':  '🟠',
+    'prime':   '🟠',
+    max:       '🟣',
+    hbo:       '🟣',
+    peacock:   '🦚',
+    paramount: '⭐',
+    tubi:      '🟡',
+    crunchyroll:'🟠',
+  };
+  function serviceEmoji(name) {
+    if (!name) return '▶';
+    var lc = name.toLowerCase();
+    for (var k in SERVICE_EMOJI) {
+      if (lc.includes(k)) return SERVICE_EMOJI[k];
+    }
+    return '▶';
+  }
+
+  function renderHero(data) {
+    var headline = data.shareHeadline
+      || (data.companionName
+          ? 'Picked for ' + data.companionName + ' tonight'
+          : 'Picks from Qulture');
+
+    $('hero-headline').textContent = headline;
+    document.title                 = headline + ' — Qulture';
+    $('og-title').content          = headline + ' — Qulture';
+    $('og-desc').content           = headline;
+
+    // Byline
+    var pickCount = (data.picks || []).length;
+    var bylineHTML = '';
+    if (data.ownerName) {
+      bylineHTML += '<strong>' + esc(data.ownerName) + '</strong>';
+    }
+    if (data.companionName) {
+      if (bylineHTML) bylineHTML += '<span class="dot">·</span>';
+      bylineHTML += '<span>for ' + esc(data.companionName) + '</span>';
+    }
+    if (bylineHTML) bylineHTML += '<span class="dot">·</span>';
+    bylineHTML += '<span>' + pickCount + (pickCount === 1 ? ' pick' : ' picks') + '</span>';
+    $('hero-byline').innerHTML = bylineHTML;
+
+    // Hero background — first pick's poster (already high-res from TMDb w500)
+    var first = (data.picks || []).find(function(p){ return p.posterUrl; });
+    if (first) {
+      $('og-image').content = first.posterUrl;
+      var el = $('hero-photo');
+      el.style.backgroundImage = 'url(' + encodeURI(first.posterUrl) + ')';
+      el.classList.add('visible');
+    }
+  }
+
+  function makePickCard(pick, index) {
+    var deepLink = safeUrl(pick.streamingDeepLink);
+    var poster   = safeUrl(pick.posterUrl);
+    var typeLabel = pick.itemType === 'tvshow' ? 'TV Series' : 'Film';
+
+    // Meta pills: year, genre, type
+    var metaHTML = '';
+    if (pick.year)  metaHTML += '<span class="meta-pill">' + esc(pick.year) + '</span>';
+    if (pick.genre) metaHTML += '<span class="meta-pill">' + esc(pick.genre.split('/')[0].trim()) + '</span>';
+    metaHTML += '<span class="meta-pill">' + esc(typeLabel) + '</span>';
+
+    // Streaming badge
+    var streamHTML = '';
+    if (pick.streamingService) {
+      var emoji = serviceEmoji(pick.streamingService);
+      streamHTML = deepLink
+        ? '<a class="streaming-pill" href="' + escAttr(deepLink) + '" target="_blank" rel="noopener">' +
+            emoji + ' ' + esc(pick.streamingService) +
+          '</a>'
+        : '<span class="streaming-pill">' + emoji + ' ' + esc(pick.streamingService) + '</span>';
+    }
+
+    var ordinals = ['One', 'Two', 'Three', 'Four', 'Five'];
+    var numLabel = ordinals[index] || ('#' + (index + 1));
+
+    var card = document.createElement('div');
+    card.className = 'pick-card';
+    card.innerHTML =
+      '<div class="poster-col">' +
+        '<div class="poster-ph">🎬</div>' +
+        (poster
+          ? '<img class="poster-img" src="' + escAttr(poster) + '" alt="' + escAttr(pick.title) + '" loading="lazy" />'
+          : '') +
+      '</div>' +
+      '<div class="pick-info">' +
+        '<div class="pick-num">Pick ' + esc(numLabel) + '</div>' +
+        (deepLink
+          ? '<a class="pick-title" href="' + escAttr(deepLink) + '" target="_blank" rel="noopener noreferrer">' + esc(pick.title) + '</a>'
+          : '<div class="pick-title">' + esc(pick.title) + '</div>') +
+        '<div class="pick-meta">' + metaHTML + streamHTML + '</div>' +
+        (pick.matchReason
+          ? '<div class="pick-reason">"' + esc(pick.matchReason) + '"</div>'
+          : '') +
+      '</div>';
+
+    // Lazy-load poster with fade-in
+    if (poster) {
+      var img = card.querySelector('.poster-img');
+      if (img) {
+        img.addEventListener('load', function() { img.classList.add('loaded'); });
+        img.addEventListener('error', function() { img.style.display = 'none'; });
+      }
+    }
+
+    return card;
+  }
+
+  function renderPicks(data) {
+    renderHero(data);
+    var container = $('picks-container');
+    var picks = data.picks || [];
+
+    if (picks.length === 0) {
+      container.innerHTML =
+        '<div class="empty-state">' +
+          '<div class="empty-icon">🎬</div>' +
+          '<div class="empty-title">No picks here yet</div>' +
+          '<div class="empty-sub">Open Qulture to generate picks with your taste graph.</div>' +
+        '</div>';
+      return;
+    }
+
+    picks.forEach(function(pick, i) {
+      container.appendChild(makePickCard(pick, i));
+    });
+  }
+
+  function load() {
+    var m = location.pathname.match(/\/shared-picks\/([A-Za-z0-9_-]+)/);
+    token = m ? m[1] : null;
+    if (!token) { hide('loading-wrap'); show('error-wrap'); return; }
+
+    fetch('/api/shared-picks/' + encodeURIComponent(token))
+      .then(function(r) {
+        if (!r.ok) return Promise.reject(r.status);
+        return r.json();
+      })
+      .then(function(data) {
+        if (data.error) throw new Error(data.error);
+        renderPicks(data);
+        hide('loading-wrap');
+        show('picks-wrap');
+
+        // Slide up the bottom bar after a short delay / on scroll
+        var barShown = false;
+        function showBar() {
+          if (barShown) return;
+          barShown = true;
+          $('bottom-bar').classList.add('up');
+        }
+        window.addEventListener('scroll', function(){ if (window.scrollY > 60) showBar(); }, { passive:true });
+        setTimeout(showBar, 1000);
+      })
+      .catch(function(err) {
+        console.error('[Qulture picks] load error:', err);
+        hide('loading-wrap');
+        show('error-wrap');
+      });
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>

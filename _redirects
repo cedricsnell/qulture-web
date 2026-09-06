@@ -8,9 +8,11 @@
 /s/*               https://qulture-backend-api.onrender.com/s/:splat                200
 /api/shared-list/* https://qulture-backend-api.onrender.com/api/shared-list/:splat  200
 
-/api/shared-plan/* https://qulture-backend-api.onrender.com/api/shared-plan/:splat  200
+/api/shared-plan/*   https://qulture-backend-api.onrender.com/api/shared-plan/:splat   200
+/api/shared-picks/*  https://qulture-backend-api.onrender.com/api/shared-picks/:splat  200
 
 /shared-plan/*   /shared-plan/index.html   200
+/shared-picks/*  /shared-picks/index.html  200
 
 # Canonical list share URL — served by local HTML that fetches from the
 # get-shared-list Netlify function; no backend proxy needed.
@@ -19,6 +21,10 @@
 # Taste snapshot and slug URLs — proxied to the backend HTML renderer.
 /taste/*  https://qulture-backend-api.onrender.com/taste/:splat  200
 /q/*      https://qulture-backend-api.onrender.com/q/:splat      200
+
+# Beta download links — update the Android URL after each new EAS build.
+/beta     https://testflight.apple.com/join/HpzUgF7D  302
+/android  https://appdistribution.firebase.dev/i/af5d157fca109722  302
 
 # Proxy well-known verification files to the backend on Render.
 # iOS reads apple-app-site-association to validate universal links (applinks).
