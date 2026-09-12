@@ -469,6 +469,84 @@
     }
     .bb-dl:hover { color:var(--text); }
 
+    /* GUEST BALLOT — mirrors GuestPreferencesForm in SharedPlanViewerScreen.tsx
+       so a non-user who lands here can answer without installing the app. */
+    .ballot {
+      max-width:var(--max-w); margin:0 auto;
+      padding:32px 24px 8px;
+    }
+    .ballot-card {
+      background:var(--surf);
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      padding:24px 22px;
+    }
+    .ballot-ttl {
+      font-family:'Playfair Display',Georgia,serif;
+      font-size:22px; font-weight:700; color:var(--text);
+      letter-spacing:-.3px; margin-bottom:6px;
+    }
+    .ballot-sub { font-size:13.5px; color:var(--text2); line-height:1.5; margin-bottom:20px; }
+    .ballot-lbl {
+      display:block;
+      font-size:11px; font-weight:700; letter-spacing:.7px;
+      text-transform:uppercase; color:var(--text3);
+      margin:18px 0 8px;
+    }
+    .ballot-lbl:first-of-type { margin-top:0; }
+    .ballot-input, .ballot-textarea {
+      width:100%;
+      font-family:inherit; font-size:14.5px; color:var(--text);
+      background:var(--surf2);
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:11px 13px;
+      -webkit-appearance:none;
+    }
+    .ballot-textarea { min-height:82px; resize:vertical; line-height:1.5; }
+    .ballot-input:focus, .ballot-textarea:focus {
+      outline:none; border-color:var(--accent); background:var(--surf);
+    }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; }
+    .chip {
+      font-family:inherit; font-size:13px; font-weight:500;
+      color:var(--text2);
+      background:var(--surf2);
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:7px 14px;
+      cursor:pointer;
+      transition:background .12s, color .12s, border-color .12s;
+    }
+    .chip:hover { border-color:var(--border2); }
+    .chip[aria-pressed="true"] {
+      background:var(--accent-bg);
+      border-color:var(--accent);
+      color:var(--accent-dk);
+      font-weight:600;
+    }
+    .ballot-submit {
+      width:100%; margin-top:24px;
+      font-family:inherit; font-size:15px; font-weight:700;
+      color:var(--bg); background:var(--text);
+      border:none; border-radius:10px;
+      padding:14px;
+      cursor:pointer;
+      transition:opacity .15s;
+    }
+    .ballot-submit:hover:not(:disabled) { opacity:.84; }
+    .ballot-submit:disabled { opacity:.5; cursor:default; }
+    .ballot-err {
+      margin-top:12px; font-size:13px; color:#b3261e; text-align:center;
+    }
+    .ballot-done { text-align:center; padding:12px 0 4px; }
+    .ballot-done-icon { font-size:34px; margin-bottom:12px; }
+    .ballot-done-ttl {
+      font-family:'Playfair Display',Georgia,serif;
+      font-size:21px; font-weight:700; margin-bottom:8px;
+    }
+    .ballot-done-sub { font-size:13.5px; color:var(--text2); line-height:1.55; }
+
     .hidden { display:none !important; }
   </style>
 </head>
@@ -522,6 +600,45 @@
       <!-- Eyebrow row injected by JS (after bookings if present, or immediately) -->
     </div>
   </div>
+
+  <!-- GUEST BALLOT — the same four fields the in-app GuestPreferencesForm
+       collects, POSTed to the same endpoint. Without this, a non-user who opens
+       a shared plan can only look at it: the ballot lived exclusively on a React
+       Native screen reachable by deep link, i.e. only to people who already had
+       the app. -->
+  <section class="ballot" id="ballot">
+    <div class="ballot-card">
+      <form id="ballot-form">
+        <div class="ballot-ttl">Add your preferences</div>
+        <div class="ballot-sub" id="ballot-sub">
+          No app needed — tell the planner what works for you and it goes straight into the plan.
+        </div>
+
+        <label class="ballot-lbl" for="g-name">Your name <span style="text-transform:none;letter-spacing:0;font-weight:400;">(optional)</span></label>
+        <input class="ballot-input" type="text" id="g-name" name="guest_name" maxlength="60" autocomplete="name" placeholder="So they know who answered" />
+
+        <span class="ballot-lbl">Cuisines you'd enjoy</span>
+        <div class="chips" id="g-cuisines" role="group" aria-label="Cuisines you would enjoy"></div>
+
+        <span class="ballot-lbl">Budget</span>
+        <div class="chips" id="g-budget" role="group" aria-label="Budget"></div>
+
+        <label class="ballot-lbl" for="g-notes">Anything else</label>
+        <textarea class="ballot-textarea" id="g-notes" name="notes" maxlength="500" placeholder="Dietary restrictions, dates that don't work, anything else…"></textarea>
+
+        <button class="ballot-submit" type="submit" id="ballot-submit">Send my preferences</button>
+        <div class="ballot-err hidden" id="ballot-err"></div>
+      </form>
+
+      <div class="ballot-done hidden" id="ballot-done">
+        <div class="ballot-done-icon">✓</div>
+        <div class="ballot-done-ttl">Thanks — sent</div>
+        <div class="ballot-done-sub" id="ballot-done-sub">
+          Your preferences are with the planner. They'll show up alongside everyone else's.
+        </div>
+      </div>
+    </div>
+  </section>
 
   <section class="promo">
     <div class="promo-inner">
@@ -992,8 +1109,105 @@
     else         renderByCat(options, container);
   }
 
+  // ── Guest ballot ──────────────────────────────────────────────────────────
+  // Mirrors GuestPreferencesForm in the app (SharedPlanViewerScreen.tsx) and
+  // POSTs the identical payload to the identical endpoint. The /api/planning/*
+  // proxy rule in _redirects keeps this same-origin, so no CORS is involved.
+  var CUISINES = ['Italian','Japanese','Mexican','American','Thai','Indian','Mediterranean','Korean','French','Chinese'];
+  var BUDGETS  = ['$','$$','$$$','$$$$'];
+
+  var selectedCuisines = [];
+  var selectedBudget   = null;
+
+  function buildChips(containerId, values, isMulti) {
+    var host = $(containerId);
+    values.forEach(function (value) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'chip';
+      btn.textContent = value;
+      btn.setAttribute('aria-pressed', 'false');
+      btn.addEventListener('click', function () {
+        if (isMulti) {
+          var i = selectedCuisines.indexOf(value);
+          if (i >= 0) selectedCuisines.splice(i, 1);
+          else        selectedCuisines.push(value);
+          btn.setAttribute('aria-pressed', i >= 0 ? 'false' : 'true');
+        } else {
+          // Single-select, toggles off when the active one is tapped again.
+          var wasActive = selectedBudget === value;
+          selectedBudget = wasActive ? null : value;
+          Array.prototype.forEach.call(host.children, function (c) {
+            c.setAttribute('aria-pressed', String(!wasActive && c === btn));
+          });
+        }
+      });
+      host.appendChild(btn);
+    });
+  }
+
+  function initBallot(session, ownerName) {
+    buildChips('g-cuisines', CUISINES, true);
+    buildChips('g-budget',   BUDGETS,  false);
+
+    if (ownerName) {
+      $('ballot-sub').textContent =
+        'No app needed — tell ' + ownerName + ' what works for you and it goes straight into the plan.';
+      $('ballot-done-sub').textContent =
+        'Your preferences are with ' + ownerName + '. They’ll show up alongside everyone else’s.';
+    }
+
+    $('ballot-form').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var btn = $('ballot-submit');
+      var err = $('ballot-err');
+      if (btn.disabled) return;
+
+      var name  = $('g-name').value.trim();
+      var notes = $('g-notes').value.trim();
+
+      if (!name && !notes && selectedCuisines.length === 0 && !selectedBudget) {
+        err.textContent = 'Pick at least one preference, or leave a note.';
+        err.classList.remove('hidden');
+        return;
+      }
+
+      err.classList.add('hidden');
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      fetch('/api/planning/guest-preferences', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          share_token: token,
+          guest_name:  name  || null,
+          cuisines:    selectedCuisines,
+          budget:      selectedBudget,
+          notes:       notes || null,
+        }),
+      })
+        .then(function (r) {
+          // The endpoint answers 204 No Content on success.
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          hide('ballot-form');
+          show('ballot-done');
+        })
+        .catch(function (e) {
+          console.error('Qulture guest preferences error:', e);
+          btn.disabled = false;
+          btn.textContent = 'Send my preferences';
+          err.textContent = 'Could not send — check your connection and try again.';
+          err.classList.remove('hidden');
+        });
+    });
+  }
+
   function load() {
-    var m = location.pathname.match(/\/shared-plan\/([A-Za-z0-9_]+)/);
+    // Share tokens may contain '-' and '_' (the backend accepts
+    // /^[a-zA-Z0-9_-]+$/). The old class omitted '-', so a hyphenated token was
+    // silently truncated at the first hyphen and the fetch 404'd.
+    var m = location.pathname.match(/\/shared-plan\/([A-Za-z0-9_-]+)/);
     token = m ? m[1] : null;
     if (!token) { hide('loading-wrap'); show('error-wrap'); return; }
 
@@ -1048,6 +1262,7 @@
       })
       .then(function(data){
         renderPlan(data.session, data.options, data.owner, data.cityPhoto, data.bookings);
+        initBallot(data.session, data.owner);
 
         hide('loading-wrap');
         show('plan-wrap');
