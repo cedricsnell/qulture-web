@@ -9,6 +9,14 @@
 /api/shared-list/* https://qulture-backend-api.onrender.com/api/shared-list/:splat  200
 
 /api/shared-plan/*   https://qulture-backend-api.onrender.com/api/shared-plan/:splat   200
+
+# Guest ballot on /shared-plan/:token POSTs here. Proxying keeps it same-origin
+# so the browser never issues a CORS preflight against Render.
+# The endpoint itself is unauthenticated by design — the share token is the
+# credential — and rate-limited to 10 submissions per token per hour.
+# Scoped to this exact path: every other /api/planning/* route requires a bearer
+# token and has no business being reachable from the share page.
+/api/planning/guest-preferences  https://qulture-backend-api.onrender.com/api/planning/guest-preferences  200
 /api/shared-picks/*  https://qulture-backend-api.onrender.com/api/shared-picks/:splat  200
 
 /shared-plan/*   /shared-plan/index.html   200
