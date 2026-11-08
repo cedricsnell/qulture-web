@@ -486,7 +486,21 @@
       font-size:22px; font-weight:700; color:var(--text);
       letter-spacing:-.3px; margin-bottom:6px;
     }
-    .ballot-sub { font-size:13.5px; color:var(--text2); line-height:1.5; margin-bottom:20px; }
+    .ballot-sub { display:block; font-size:13.5px; color:var(--text2); line-height:1.5; }
+    .ballot-ttl { display:block; }
+    .ballot-toggle {
+      width:100%; display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
+      font-family:inherit; text-align:left; color:inherit;
+      background:none; border:none; padding:0; cursor:pointer;
+    }
+    .ballot-chev {
+      flex-shrink:0; width:28px; height:28px; border-radius:999px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:18px; line-height:1; color:var(--accent-dk);
+      background:var(--accent-bg); transition:transform .18s;
+    }
+    .ballot-toggle[aria-expanded="true"] .ballot-chev { transform:rotate(45deg); }
+    .ballot-body { padding-top:20px; }
     .ballot-lbl {
       display:block;
       font-size:11px; font-weight:700; letter-spacing:.7px;
@@ -601,40 +615,50 @@
     </div>
   </div>
 
-  <!-- GUEST BALLOT — the same four fields the in-app GuestPreferencesForm
-       collects, POSTed to the same endpoint. Without this, a non-user who opens
-       a shared plan can only look at it: the ballot lived exclusively on a React
-       Native screen reachable by deep link, i.e. only to people who already had
-       the app. -->
+  <!-- GUEST PREFERENCES — lets a non-user who opens a shared plan tell the
+       planner what they want. POSTs to /api/planning-sessions/guest-preferences/:token,
+       which stores a role='guest' row in planning_participants so the planner sees
+       the guest and the in-app AI factors their answers into the plan. -->
   <section class="ballot" id="ballot">
     <div class="ballot-card">
-      <form id="ballot-form">
-        <div class="ballot-ttl">Add your preferences</div>
-        <div class="ballot-sub" id="ballot-sub">
-          No app needed — tell the planner what works for you and it goes straight into the plan.
-        </div>
+      <button class="ballot-toggle" type="button" id="ballot-toggle"
+              aria-expanded="false" aria-controls="ballot-body">
+        <span>
+          <span class="ballot-ttl">Tell us your preferences</span>
+          <span class="ballot-sub" id="ballot-sub">
+            No app needed — tell the planner what you want and it goes straight into the plan.
+          </span>
+        </span>
+        <span class="ballot-chev" aria-hidden="true">+</span>
+      </button>
 
-        <label class="ballot-lbl" for="g-name">Your name <span style="text-transform:none;letter-spacing:0;font-weight:400;">(optional)</span></label>
-        <input class="ballot-input" type="text" id="g-name" name="guest_name" maxlength="60" autocomplete="name" placeholder="So they know who answered" />
+      <div class="ballot-body hidden" id="ballot-body">
+        <form id="ballot-form" novalidate>
+          <label class="ballot-lbl" for="g-name">Your name</label>
+          <input class="ballot-input" type="text" id="g-name" name="guestName" maxlength="60" autocomplete="name" required placeholder="So the planner knows who answered" />
 
-        <span class="ballot-lbl">Cuisines you'd enjoy</span>
-        <div class="chips" id="g-cuisines" role="group" aria-label="Cuisines you would enjoy"></div>
+          <span class="ballot-lbl">Budget</span>
+          <div class="chips" id="g-budget" role="group" aria-label="Budget"></div>
 
-        <span class="ballot-lbl">Budget</span>
-        <div class="chips" id="g-budget" role="group" aria-label="Budget"></div>
+          <span class="ballot-lbl">Interests</span>
+          <div class="chips" id="g-interests" role="group" aria-label="Interests"></div>
 
-        <label class="ballot-lbl" for="g-notes">Anything else</label>
-        <textarea class="ballot-textarea" id="g-notes" name="notes" maxlength="500" placeholder="Dietary restrictions, dates that don't work, anything else…"></textarea>
+          <label class="ballot-lbl" for="g-mustdo">Must-do</label>
+          <textarea class="ballot-textarea" id="g-mustdo" name="mustDo" maxlength="500" placeholder="Anything you definitely want to do?"></textarea>
 
-        <button class="ballot-submit" type="submit" id="ballot-submit">Send my preferences</button>
-        <div class="ballot-err hidden" id="ballot-err"></div>
-      </form>
+          <label class="ballot-lbl" for="g-avoid">Avoid</label>
+          <textarea class="ballot-textarea" id="g-avoid" name="avoid" maxlength="500" placeholder="Anything to skip?"></textarea>
 
-      <div class="ballot-done hidden" id="ballot-done">
-        <div class="ballot-done-icon">✓</div>
-        <div class="ballot-done-ttl">Thanks — sent</div>
-        <div class="ballot-done-sub" id="ballot-done-sub">
-          Your preferences are with the planner. They'll show up alongside everyone else's.
+          <button class="ballot-submit" type="submit" id="ballot-submit">Add my preferences</button>
+          <div class="ballot-err hidden" id="ballot-err" role="alert"></div>
+        </form>
+
+        <div class="ballot-done hidden" id="ballot-done">
+          <div class="ballot-done-icon">✓</div>
+          <div class="ballot-done-ttl">Thanks — you're in</div>
+          <div class="ballot-done-sub" id="ballot-done-sub">
+            Your preferences have been added! The plan will be updated with your input.
+          </div>
         </div>
       </div>
     </div>
@@ -1109,29 +1133,31 @@
     else         renderByCat(options, container);
   }
 
-  // ── Guest ballot ──────────────────────────────────────────────────────────
-  // Mirrors GuestPreferencesForm in the app (SharedPlanViewerScreen.tsx) and
-  // POSTs the identical payload to the identical endpoint. The /api/planning/*
-  // proxy rule in _redirects keeps this same-origin, so no CORS is involved.
-  var CUISINES = ['Italian','Japanese','Mexican','American','Thai','Indian','Mediterranean','Korean','French','Chinese'];
-  var BUDGETS  = ['$','$$','$$$','$$$$'];
+  // ── Guest preferences ─────────────────────────────────────────────────────
+  // POSTs to /api/planning-sessions/guest-preferences/:token (proxied same-origin
+  // by _redirects). The backend stores a role='guest' planning_participants row,
+  // which the in-app planning AI reads as part of the group context.
+  // Chip values are the labels lowercased — the backend whitelists exactly these.
+  var BUDGETS   = ['Budget','Mid-range','Splurge'];
+  var INTERESTS = ['Beach','Food','Nightlife','Culture','Adventure','Relaxation'];
 
-  var selectedCuisines = [];
-  var selectedBudget   = null;
+  var selectedInterests = [];
+  var selectedBudget    = null;
 
   function buildChips(containerId, values, isMulti) {
     var host = $(containerId);
-    values.forEach(function (value) {
+    values.forEach(function (label) {
+      var value = label.toLowerCase();
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'chip';
-      btn.textContent = value;
+      btn.textContent = label;
       btn.setAttribute('aria-pressed', 'false');
       btn.addEventListener('click', function () {
         if (isMulti) {
-          var i = selectedCuisines.indexOf(value);
-          if (i >= 0) selectedCuisines.splice(i, 1);
-          else        selectedCuisines.push(value);
+          var i = selectedInterests.indexOf(value);
+          if (i >= 0) selectedInterests.splice(i, 1);
+          else        selectedInterests.push(value);
           btn.setAttribute('aria-pressed', i >= 0 ? 'false' : 'true');
         } else {
           // Single-select, toggles off when the active one is tapped again.
@@ -1147,15 +1173,20 @@
   }
 
   function initBallot(session, ownerName) {
-    buildChips('g-cuisines', CUISINES, true);
-    buildChips('g-budget',   BUDGETS,  false);
+    buildChips('g-budget',    BUDGETS,   false);
+    buildChips('g-interests', INTERESTS, true);
 
     if (ownerName) {
       $('ballot-sub').textContent =
-        'No app needed — tell ' + ownerName + ' what works for you and it goes straight into the plan.';
-      $('ballot-done-sub').textContent =
-        'Your preferences are with ' + ownerName + '. They’ll show up alongside everyone else’s.';
+        'No app needed — tell ' + ownerName + ' what you want and it goes straight into the plan.';
     }
+
+    $('ballot-toggle').addEventListener('click', function () {
+      var open = this.getAttribute('aria-expanded') === 'true';
+      this.setAttribute('aria-expanded', String(!open));
+      if (open) hide('ballot-body');
+      else { show('ballot-body'); $('g-name').focus(); }
+    });
 
     $('ballot-form').addEventListener('submit', function (ev) {
       ev.preventDefault();
@@ -1163,41 +1194,50 @@
       var err = $('ballot-err');
       if (btn.disabled) return;
 
-      var name  = $('g-name').value.trim();
-      var notes = $('g-notes').value.trim();
-
-      if (!name && !notes && selectedCuisines.length === 0 && !selectedBudget) {
-        err.textContent = 'Pick at least one preference, or leave a note.';
+      var name = $('g-name').value.trim();
+      if (!name) {
+        err.textContent = 'Add your name so the planner knows who answered.';
         err.classList.remove('hidden');
+        $('g-name').focus();
         return;
       }
 
       err.classList.add('hidden');
       btn.disabled = true;
-      btn.textContent = 'Sending…';
+      btn.textContent = 'Adding…';
 
-      fetch('/api/planning/guest-preferences', {
+      fetch('/api/planning-sessions/guest-preferences/' + encodeURIComponent(token), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          share_token: token,
-          guest_name:  name  || null,
-          cuisines:    selectedCuisines,
-          budget:      selectedBudget,
-          notes:       notes || null,
+          guestName: name,
+          preferences: {
+            budget:              selectedBudget || '',
+            interests:           selectedInterests.slice(),
+            dietaryRestrictions: '',
+            mustDo:              $('g-mustdo').value.trim(),
+            avoid:               $('g-avoid').value.trim(),
+          },
         }),
       })
         .then(function (r) {
-          // The endpoint answers 204 No Content on success.
-          if (!r.ok) throw new Error('HTTP ' + r.status);
+          if (!r.ok) {
+            var e = new Error('HTTP ' + r.status);
+            e.status = r.status;
+            throw e;
+          }
           hide('ballot-form');
           show('ballot-done');
         })
         .catch(function (e) {
           console.error('Qulture guest preferences error:', e);
           btn.disabled = false;
-          btn.textContent = 'Send my preferences';
-          err.textContent = 'Could not send — check your connection and try again.';
+          btn.textContent = 'Add my preferences';
+          err.textContent = e && e.status === 429
+            ? 'This plan has had a lot of responses — try again in an hour.'
+            : e && e.status === 404
+              ? 'This plan is no longer shared.'
+              : 'Could not send — check your connection and try again.';
           err.classList.remove('hidden');
         });
     });
